@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">ReplayView</string>
+
+    <string name="time_zero">00:00</string>
+    <string name="play_pause_button">play / pause button</string>
+    <string name="pick_file_button">pick file button</string>
+</resources>
