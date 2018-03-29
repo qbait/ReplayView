@@ -28,11 +28,13 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application) 
     private val importDataManager: ImportDataManager
     private var subscription: Subscription? = null
 
-    private var playingThread: Thread? = null
+    private val playingThread: Thread
 
     init {
         isPlayingLiveData.value = false
+        progressLiveData.value = 0
         importDataManager = ImportDataManager(application)
+        playingThread = initPlayingThread()
     }
 
     fun toggle() {
@@ -73,23 +75,20 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application) 
         isProcessingLiveData.value = false
     }
 
-    private fun initPlayback() {
-        setProgress(0)
-
-        playingThread = Thread {
+    private fun initPlayingThread(): Thread {
+        return Thread {
             while (true) {
                 if (isPlayingLiveData.value!!) {
-                    val progress = progressLiveData.value
+                    val progress = progressLiveData.value!!
                     if (progress == 100) {
                         stop()
                     } else {
-                        postProgress(progress!! + 1)
+                        postProgress(progress + 1)
                         try {
                             Thread.sleep(100)
                         } catch (e: InterruptedException) {
                             e.printStackTrace()
                         }
-
                     }
                 }
             }
@@ -97,13 +96,9 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     private fun play() {
-        if (playingThread == null) {
-            initPlayback()
-        }
-
         isPlayingLiveData.value = true
-        if (playingThread!!.state == Thread.State.NEW) {
-            playingThread!!.start()
+        if (playingThread.state == Thread.State.NEW) {
+            playingThread.start()
         }
     }
 
