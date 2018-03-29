@@ -15,12 +15,15 @@ import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 public class ReplayViewModel extends AndroidViewModel {
-    private MutableLiveData<Boolean> mIsPlayingLiveData = new MutableLiveData<>();
     private MutableLiveData<Boolean> mIsProcessingLiveData = new MutableLiveData<>();
     private MutableLiveData<List<ReplayEvent>> mEventsLiveData = new MutableLiveData<>();
 
+    private MutableLiveData<Boolean> mIsPlayingLiveData = new MutableLiveData<>();
+    private MutableLiveData<Integer> mProgressLiveData = new MutableLiveData<>();
+
     public final List<String> availableDataTypes = Collections.unmodifiableList(Arrays.asList(ImportDataManager.TYPE_WIFI, ImportDataManager.TYPE_GPS, ImportDataManager.TYPE_BLUETOOTH, ImportDataManager.TYPE_SENSOR));
-    public CharSequence[] mPickedDataTypes;
+
+    private CharSequence[] mPickedDataTypes;
     private ImportDataManager mImportDataManager;
     private Subscription mSubscription;
 
@@ -32,7 +35,11 @@ public class ReplayViewModel extends AndroidViewModel {
     }
 
     public void toggle() {
-        mIsPlayingLiveData.setValue(!mIsPlayingLiveData.getValue());
+        if (mIsPlayingLiveData.getValue() == true) {
+            pause();
+        } else {
+            play();
+        }
     }
 
     public MutableLiveData<Boolean> getIsPlayingLiveData() {
@@ -45,6 +52,10 @@ public class ReplayViewModel extends AndroidViewModel {
 
     public MutableLiveData<List<ReplayEvent>> getEventsLiveData() {
         return mEventsLiveData;
+    }
+
+    public MutableLiveData<Integer> getProgressLiveData() {
+        return mProgressLiveData;
     }
 
     public void zipPicked(String path) {
@@ -75,6 +86,58 @@ public class ReplayViewModel extends AndroidViewModel {
     private void onError(Throwable throwable) {
         Timber.e(throwable);
         mIsProcessingLiveData.setValue(false);
+    }
+
+    private Thread mPlayingThread;
+
+    private void initPlayback() {
+        mProgressLiveData.setValue(0);
+
+        mPlayingThread = new Thread(() -> {
+            while (true) {
+                if (mIsPlayingLiveData.getValue()) {
+                    Integer progress = mProgressLiveData.getValue();
+                    if(progress == 100) {
+                        stop();
+                    } else {
+                        mProgressLiveData.postValue( progress + 1 );
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private void play() {
+        if (mPlayingThread == null) {
+            initPlayback();
+        }
+
+        mIsPlayingLiveData.setValue(true);
+        if (mPlayingThread.getState() == Thread.State.NEW) {
+            mPlayingThread.start();
+        }
+    }
+
+    private void pause() {
+        mIsPlayingLiveData.setValue(false);
+    }
+
+    private void stop() {
+        mIsPlayingLiveData.setValue(false);
+        mProgressLiveData.setValue(0);
+    }
+
+    public String getPlayingTime(int progress) {
+        return progress + "";
+    }
+
+    public String getTotalTime() {
+        return "100";
     }
 
 }

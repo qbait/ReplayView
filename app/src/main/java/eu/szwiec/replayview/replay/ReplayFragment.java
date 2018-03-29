@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -35,6 +36,8 @@ public class ReplayFragment extends Fragment {
     private ImageButton mPlayPauseButton;
     private ImageButton mPickFileButton;
     private SeekBar mSeekbar;
+    private TextView mPlayingTime;
+    private TextView mTotalTime;
     private SpeedButton mSpeedButton;
 
     private MaterialDialog mProgressDialog;
@@ -45,14 +48,6 @@ public class ReplayFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_replay, container, false);
 
         mViewModel = ViewModelProviders.of(this).get(ReplayViewModel.class);
-
-        mViewModel.getIsPlayingLiveData().observe(this, isPlaying -> {
-            if (isPlaying) {
-                mPlayPauseIconDrawable.animateToState(PAUSE);
-            } else {
-                mPlayPauseIconDrawable.animateToState(PLAY);
-            }
-        });
 
         mViewModel.getIsProcessingLiveData().observe(this, isProcessing -> {
             if (isProcessing) {
@@ -69,6 +64,21 @@ public class ReplayFragment extends Fragment {
                 enablePlayackControls(false);
                 Toast.makeText(getContext(), "No data", Toast.LENGTH_SHORT).show();
             }
+
+            mTotalTime.setText(mViewModel.getTotalTime());
+        });
+
+        mViewModel.getIsPlayingLiveData().observe(this, isPlaying -> {
+            if (isPlaying) {
+                mPlayPauseIconDrawable.animateToState(PAUSE);
+            } else {
+                mPlayPauseIconDrawable.animateToState(PLAY);
+            }
+        });
+
+        mViewModel.getProgressLiveData().observe(this, progress -> {
+            mSeekbar.setProgress(progress);
+            mPlayingTime.setText(mViewModel.getPlayingTime(progress));
         });
 
         init(rootView);
@@ -80,19 +90,38 @@ public class ReplayFragment extends Fragment {
         mPlayPauseButton = rootView.findViewById(R.id.play_pause_button);
         mPickFileButton = rootView.findViewById(R.id.pick_file_button);
         mSeekbar = rootView.findViewById(R.id.seekbar);
+        mPlayingTime = rootView.findViewById(R.id.playing_time);
+        mTotalTime = rootView.findViewById(R.id.total_time);
         mSpeedButton = rootView.findViewById(R.id.speed_button);
 
         mPlayPauseIconDrawable = buildPlayPause();
         mProgressDialog = buildProgressDialog();
 
-        enablePlayackControls(false);
+        enablePlayackControls(true);
 
         mPlayPauseButton.setOnClickListener(v -> mViewModel.toggle());
         mPickFileButton.setOnClickListener(v -> buildDataTypeDialog().show());
+
+        mSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(fromUser) {
+                    mViewModel.getProgressLiveData().setValue(seekBar.getProgress());
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
     }
 
     private MaterialDialog buildProgressDialog() {
-         return new MaterialDialog.Builder(this.getContext())
+        return new MaterialDialog.Builder(this.getContext())
                 .content("Loading...")
                 .progress(true, 0)
                 .cancelable(false)
