@@ -46,6 +46,9 @@ public class ReplayFragment extends Fragment {
 
         mViewModel.getIsProcessingLiveData().observe(this, isProcessing -> {
             if (isProcessing) {
+                if(mProgressDialog == null) {
+                    mProgressDialog = buildProgressDialog();
+                }
                 mProgressDialog.show();
             } else {
                 mProgressDialog.dismiss();
@@ -82,10 +85,7 @@ public class ReplayFragment extends Fragment {
     }
 
     private void init() {
-
         mPlayPauseIconDrawable = buildPlayPause();
-        mProgressDialog = buildProgressDialog();
-
         enablePlayackControls(true);
 
         mBinding.playPauseButton.setOnClickListener(v -> mViewModel.toggle());
