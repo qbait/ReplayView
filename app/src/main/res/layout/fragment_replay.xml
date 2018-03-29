@@ -22,6 +22,7 @@
             android:layout_height="48dp"
             android:layout_weight="0"
             android:layout_marginStart="8dp"
+            android:onClick="@{() -> viewModel.toggle()}"
             android:contentDescription="@string/play_pause_button" />
 
         <eu.szwiec.replayview.replay.SpeedButton

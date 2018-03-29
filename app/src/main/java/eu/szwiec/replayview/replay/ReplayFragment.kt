@@ -84,7 +84,6 @@ class ReplayFragment : Fragment() {
         mPlayPauseIconDrawable = buildPlayPause()
         enablePlayackControls(true)
 
-        mBinding!!.playPauseButton.setOnClickListener { v -> mViewModel!!.toggle() }
         mBinding!!.pickFileButton.setOnClickListener { v -> buildDataTypeDialog().show() }
 
         mBinding!!.seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
