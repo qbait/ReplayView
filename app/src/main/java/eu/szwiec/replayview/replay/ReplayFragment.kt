@@ -11,21 +11,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
-import android.widget.Toast
-
 import com.afollestad.materialdialogs.MaterialDialog
 import com.github.angads25.filepicker.model.DialogConfigs
 import com.github.angads25.filepicker.model.DialogProperties
 import com.github.angads25.filepicker.view.FilePickerDialog
-
-import java.io.File
-
 import eu.szwiec.replayview.R
 import eu.szwiec.replayview.databinding.FragmentReplayBinding
 import rm.com.youtubeplayicon.PlayIconDrawable
-
 import rm.com.youtubeplayicon.PlayIconDrawable.IconState.PAUSE
 import rm.com.youtubeplayicon.PlayIconDrawable.IconState.PLAY
+import java.io.File
 
 class ReplayFragment : Fragment() {
 
