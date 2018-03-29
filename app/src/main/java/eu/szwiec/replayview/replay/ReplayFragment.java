@@ -1,6 +1,7 @@
 package eu.szwiec.replayview.replay;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -10,9 +11,7 @@ import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -23,6 +22,7 @@ import com.github.angads25.filepicker.view.FilePickerDialog;
 import java.io.File;
 
 import eu.szwiec.replayview.R;
+import eu.szwiec.replayview.databinding.FragmentReplayBinding;
 import rm.com.youtubeplayicon.PlayIconDrawable;
 
 import static rm.com.youtubeplayicon.PlayIconDrawable.IconState.PAUSE;
@@ -31,21 +31,16 @@ import static rm.com.youtubeplayicon.PlayIconDrawable.IconState.PLAY;
 public class ReplayFragment extends Fragment {
 
     private ReplayViewModel mViewModel;
+    private FragmentReplayBinding mBinding;
 
     private PlayIconDrawable mPlayPauseIconDrawable;
-    private ImageButton mPlayPauseButton;
-    private ImageButton mPickFileButton;
-    private SeekBar mSeekbar;
-    private TextView mPlayingTime;
-    private TextView mTotalTime;
-    private SpeedButton mSpeedButton;
-
     private MaterialDialog mProgressDialog;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_replay, container, false);
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_replay, container, false);
+        View view = mBinding.getRoot();
 
         mViewModel = ViewModelProviders.of(this).get(ReplayViewModel.class);
 
@@ -65,7 +60,7 @@ public class ReplayFragment extends Fragment {
                 Toast.makeText(getContext(), "No data", Toast.LENGTH_SHORT).show();
             }
 
-            mTotalTime.setText(mViewModel.getTotalTime());
+            mBinding.totalTime.setText(mViewModel.getTotalTime());
         });
 
         mViewModel.getIsPlayingLiveData().observe(this, isPlaying -> {
@@ -77,32 +72,26 @@ public class ReplayFragment extends Fragment {
         });
 
         mViewModel.getProgressLiveData().observe(this, progress -> {
-            mSeekbar.setProgress(progress);
-            mPlayingTime.setText(mViewModel.getPlayingTime(progress));
+            mBinding.seekbar.setProgress(progress);
+            mBinding.playingTime.setText(mViewModel.getPlayingTime(progress));
         });
 
-        init(rootView);
+        init();
 
-        return rootView;
+        return view;
     }
 
-    private void init(View rootView) {
-        mPlayPauseButton = rootView.findViewById(R.id.play_pause_button);
-        mPickFileButton = rootView.findViewById(R.id.pick_file_button);
-        mSeekbar = rootView.findViewById(R.id.seekbar);
-        mPlayingTime = rootView.findViewById(R.id.playing_time);
-        mTotalTime = rootView.findViewById(R.id.total_time);
-        mSpeedButton = rootView.findViewById(R.id.speed_button);
+    private void init() {
 
         mPlayPauseIconDrawable = buildPlayPause();
         mProgressDialog = buildProgressDialog();
 
         enablePlayackControls(true);
 
-        mPlayPauseButton.setOnClickListener(v -> mViewModel.toggle());
-        mPickFileButton.setOnClickListener(v -> buildDataTypeDialog().show());
+        mBinding.playPauseButton.setOnClickListener(v -> mViewModel.toggle());
+        mBinding.pickFileButton.setOnClickListener(v -> buildDataTypeDialog().show());
 
-        mSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        mBinding.seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser) {
@@ -133,7 +122,7 @@ public class ReplayFragment extends Fragment {
                 .withInterpolator(new FastOutSlowInInterpolator())
                 .withDuration(300)
                 .withInitialState(PLAY)
-                .into(mPlayPauseButton);
+                .into(mBinding.playPauseButton);
     }
 
 
@@ -174,9 +163,9 @@ public class ReplayFragment extends Fragment {
     }
 
     private void enablePlayackControls(boolean enabled) {
-        mPlayPauseButton.setEnabled(enabled);
-        mSeekbar.setEnabled(enabled);
-        mSpeedButton.setEnabled(enabled);
+        mBinding.playPauseButton.setEnabled(enabled);
+        mBinding.seekbar.setEnabled(enabled);
+        mBinding.speedButton.setEnabled(enabled);
 
         if (enabled) {
             mPlayPauseIconDrawable.setColor(getResources().getColor(R.color.colorPrimaryDark));

@@ -1,81 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center"
-    android:paddingTop="4dp"
-    android:paddingBottom="4dp">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ImageButton
-        android:id="@+id/play_pause_button"
-        android:background="?selectableItemBackgroundBorderless"
-        android:padding="8dp"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_weight="0"
-        android:layout_marginStart="8dp"
-        android:contentDescription="@string/play_pause_button"/>
+    <data>
 
-    <eu.szwiec.replayview.replay.SpeedButton
-        android:id="@+id/speed_button"
-        android:layout_width="52dp"
-        android:layout_height="48dp"
-        android:layout_weight="0"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:background="?selectableItemBackgroundBorderless"
-        />
+    </data>
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp">
 
-        <TextView
-            android:id="@+id/playing_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/time_zero"
-            android:layout_marginTop="4dp"
-            android:textSize="12sp"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="6dp"
-            android:layout_alignParentStart="true"
-            />
+        <ImageButton
+            android:id="@+id/play_pause_button"
+            android:background="?selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_weight="0"
+            android:layout_marginStart="8dp"
+            android:contentDescription="@string/play_pause_button" />
 
-        <TextView
-            android:id="@+id/total_time"
+        <eu.szwiec.replayview.replay.SpeedButton
+            android:id="@+id/speed_button"
+            android:layout_width="52dp"
+            android:layout_height="48dp"
+            android:layout_weight="0"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:background="?selectableItemBackgroundBorderless" />
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/time_zero"
-            android:layout_marginTop="4dp"
-            android:textSize="12sp"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="6dp"
-            android:layout_toEndOf="@id/playing_time"
-            android:gravity="end"
-            />
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <SeekBar
-            android:id="@+id/seekbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:layout_alignParentBottom="true" />
+            <TextView
+                android:id="@+id/playing_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/time_zero"
+                android:layout_marginTop="4dp"
+                android:textSize="12sp"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="6dp"
+                android:layout_alignParentStart="true" />
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/total_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/time_zero"
+                android:layout_marginTop="4dp"
+                android:textSize="12sp"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="6dp"
+                android:layout_toEndOf="@id/playing_time"
+                android:gravity="end" />
 
-    <ImageButton
-        android:id="@+id/pick_file_button"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_weight="0"
-        android:src="@drawable/ic_pick_file"
-        android:padding="12dp"
-        android:background="?selectableItemBackgroundBorderless"
-        android:layout_marginEnd="8dp"
-        android:contentDescription="@string/pick_file_button"
-        />
+            <SeekBar
+                android:id="@+id/seekbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:layout_alignParentBottom="true" />
 
-</LinearLayout>
+        </RelativeLayout>
+
+        <ImageButton
+            android:id="@+id/pick_file_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_weight="0"
+            android:src="@drawable/ic_pick_file"
+            android:padding="12dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="@string/pick_file_button" />
+
+    </LinearLayout>
+</layout>
