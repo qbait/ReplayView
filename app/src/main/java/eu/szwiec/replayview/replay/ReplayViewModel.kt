@@ -1,18 +1,15 @@
 package eu.szwiec.replayview.replay
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.ViewModel
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
+import java.util.*
 
-import java.util.Arrays
-import java.util.Collections
-
-import rx.Subscription
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
-import timber.log.Timber
-
-class ReplayViewModel(application: Application) : AndroidViewModel(application) {
+class ReplayViewModel : ViewModel() {
     val isProcessingLiveData = MutableLiveData<Boolean>()
     val eventsLiveData = MutableLiveData<List<ReplayEvent>>()
 
@@ -29,7 +26,6 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application) 
 
     private var pickedDataTypes: Array<CharSequence>? = null
     private val importDataManager: ImportDataManager
-    private var subscription: Subscription? = null
 
     private val playingThread: Thread
 
@@ -38,7 +34,7 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application) 
         progressLiveData.value = 0
         eventsLiveData.value = null;
         speedLiveData.value = 1
-        importDataManager = ImportDataManager(application)
+        importDataManager = ImportDataManager()
         playingThread = initPlayingThread()
     }
 
@@ -55,7 +51,7 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application) 
 
         val currentSpeed = speedLiveData.value
         val currentSpeedId = speeds.indexOf(currentSpeed)
-        if(currentSpeedId == speeds.size-1) {
+        if (currentSpeedId == speeds.size - 1) {
             nextSpeedId = 0
         } else {
             nextSpeedId = currentSpeedId + 1
@@ -70,27 +66,22 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application) 
 
     private fun importData(path: String, pickedDataTypes: Array<CharSequence>?) {
 
-        subscription = importDataManager.getDataObservable(path, pickedDataTypes)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        { venues -> onSuccess(venues) }
-                ) { throwable -> onError(throwable) }
+        launch(UI) {
+            val replayEvents: Deferred<List<ReplayEvent>> = async(CommonPool) {
+                importDataManager.importData(path, pickedDataTypes)
+            }
+            onSuccess(replayEvents.await())
+        }
     }
 
-    fun typesPicked(pickedTypes: Array<CharSequence>) {
-        pickedDataTypes = pickedTypes
-    }
-
-    private fun onSuccess(replayEvents: List<ReplayEvent>) {
-        eventsLiveData.value = replayEvents
+    private fun onSuccess(events: List<ReplayEvent>) {
+        eventsLiveData.value = events
         isProcessingLiveData.value = false
         totalTimeLiveData.value = getTotalTime()
     }
 
-    private fun onError(throwable: Throwable) {
-        Timber.e(throwable)
-        isProcessingLiveData.value = false
+    fun typesPicked(pickedTypes: Array<CharSequence>) {
+        pickedDataTypes = pickedTypes
     }
 
     private fun initPlayingThread(): Thread {
@@ -103,7 +94,7 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application) 
                     } else {
                         postProgress(progress + 1)
                         try {
-                            Thread.sleep((500/ speedLiveData.value!!).toLong())
+                            Thread.sleep((500 / speedLiveData.value!!).toLong())
                         } catch (e: InterruptedException) {
                             e.printStackTrace()
                         }
@@ -134,7 +125,7 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun getTotalTime(): String {
-        return "100"
+        return eventsLiveData.value?.size.toString()
     }
 
     fun setProgress(progress: Int) {
@@ -146,5 +137,4 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application) 
         progressLiveData.postValue(progress)
         playingTimeLiveData.postValue(getPlayingTime(progress))
     }
-
 }

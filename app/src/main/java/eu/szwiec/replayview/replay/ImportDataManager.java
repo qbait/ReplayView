@@ -27,8 +27,6 @@ import eu.szwiec.replayview.otto.EddystoneUidPacketEvent;
 import eu.szwiec.replayview.otto.NvGeofenceEvent;
 import eu.szwiec.replayview.otto.SDKWifiScanResultEvent;
 import eu.szwiec.replayview.otto.SensorArrayValuesEvent;
-import eu.szwiec.replayview.replay.ReplayEvent;
-import rx.Observable;
 import timber.log.Timber;
 
 /**
@@ -42,19 +40,10 @@ public class ImportDataManager {
     static final String TYPE_BLUETOOTH = "bluetooth";
     static final String TYPE_WIFI = "wifi";
 
-    private Context mContext;
     private File mDir;
     private List<ReplayEvent> mData = new ArrayList<>();
 
-    public ImportDataManager(Context mContext) {
-        this.mContext = mContext;
-    }
-
-    public Observable<List<ReplayEvent>> getDataObservable(String zipPath, CharSequence[] dataTypes) {
-        return Observable.fromCallable(() -> importData(zipPath, dataTypes));
-    }
-
-    private List<ReplayEvent> importData(String zipPath, CharSequence[] dataTypes) throws IOException {
+    public List<ReplayEvent> importData(String zipPath, CharSequence[] dataTypes) throws IOException {
 
         mData.clear();
 
