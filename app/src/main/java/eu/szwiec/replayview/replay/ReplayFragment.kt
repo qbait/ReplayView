@@ -29,67 +29,56 @@ import rm.com.youtubeplayicon.PlayIconDrawable.IconState.PLAY
 
 class ReplayFragment : Fragment() {
 
-    private var mViewModel: ReplayViewModel? = null
-    private var mBinding: FragmentReplayBinding? = null
-
-    private var mPlayPauseIconDrawable: PlayIconDrawable? = null
-    private var mProgressDialog: MaterialDialog? = null
+    private lateinit var viewModel: ReplayViewModel
+    private lateinit var binding: FragmentReplayBinding
+    private lateinit var playPauseIconDrawable: PlayIconDrawable
+    private lateinit var progressDialog: MaterialDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_replay, container, false)
-        mViewModel = ViewModelProviders.of(this).get(ReplayViewModel::class.java)
-        mBinding?.let {
-            it.viewModel = mViewModel
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_replay, container, false)
+        viewModel = ViewModelProviders.of(this).get(ReplayViewModel::class.java)
+        binding.let {
+            it.viewModel = viewModel
             it.setLifecycleOwner(this)
         }
 
-        val view = mBinding?.root
+        val view = binding.root
 
-        mViewModel!!.isProcessingLiveData.observe(this, Observer { isProcessing ->
+        viewModel.isProcessingLiveData.observe(this, Observer { isProcessing ->
             if (isProcessing!!) {
-                if (mProgressDialog == null) {
-                    mProgressDialog = buildProgressDialog()
-                }
-                mProgressDialog!!.show()
+                progressDialog.show()
             } else {
-                mProgressDialog!!.dismiss()
+                progressDialog.dismiss()
             }
         })
 
-        mViewModel!!.eventsLiveData.observe(this, Observer { events ->
-            if (events!!.size != 0) {
+        viewModel.eventsLiveData.observe(this, Observer { events ->
+            if (events != null && events.size != 0) {
                 enablePlayackControls(true)
             } else {
                 enablePlayackControls(false)
-                Toast.makeText(context, "No data", Toast.LENGTH_SHORT).show()
             }
         })
 
-        mViewModel!!.isPlayingLiveData.observe(this, Observer { isPlaying ->
+        viewModel.isPlayingLiveData.observe(this, Observer { isPlaying ->
             if (isPlaying!!) {
-                mPlayPauseIconDrawable!!.animateToState(PAUSE)
+                playPauseIconDrawable.animateToState(PAUSE)
             } else {
-                mPlayPauseIconDrawable!!.animateToState(PLAY)
+                playPauseIconDrawable.animateToState(PLAY)
             }
         })
 
-        mViewModel!!.progressLiveData.observe(this, Observer { progress -> mBinding!!.seekbar.progress = progress!! })
+        playPauseIconDrawable = buildPlayPause()
+        progressDialog = buildProgressDialog()
 
-        init()
+        viewModel.progressLiveData.observe(this, Observer { progress -> binding.seekbar.progress = progress!! })
 
-        return view
-    }
+        binding.pickFileButton.setOnClickListener { v -> buildDataTypeDialog().show() }
 
-    private fun init() {
-        mPlayPauseIconDrawable = buildPlayPause()
-        enablePlayackControls(true)
-
-        mBinding!!.pickFileButton.setOnClickListener { v -> buildDataTypeDialog().show() }
-
-        mBinding!!.seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        binding.seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    mViewModel!!.setProgress(progress)
+                    viewModel.setProgress(progress)
                 }
             }
 
@@ -97,6 +86,7 @@ class ReplayFragment : Fragment() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {}
         })
+        return view
     }
 
     private fun buildProgressDialog(): MaterialDialog {
@@ -112,7 +102,7 @@ class ReplayFragment : Fragment() {
                 .withInterpolator(FastOutSlowInInterpolator())
                 .withDuration(300)
                 .withInitialState(PLAY)
-                .into(mBinding!!.playPauseButton)
+                .into(binding.playPauseButton)
     }
 
 
@@ -129,7 +119,7 @@ class ReplayFragment : Fragment() {
         val filePickerDialog = FilePickerDialog(context, properties)
         filePickerDialog.setTitle("Select a File")
 
-        filePickerDialog.setDialogSelectionListener { files -> mViewModel!!.zipPicked(files[0]) }
+        filePickerDialog.setDialogSelectionListener { files -> viewModel.zipPicked(files[0]) }
 
         return filePickerDialog
     }
@@ -138,9 +128,9 @@ class ReplayFragment : Fragment() {
 
         return MaterialDialog.Builder(context!!)
                 .title("Choose data type")
-                .items(mViewModel!!.availableDataTypes)
+                .items(viewModel.availableDataTypes)
                 .itemsCallbackMultiChoice(null) { dialog, which, text ->
-                    mViewModel!!.typesPicked(text)
+                    viewModel.typesPicked(text)
                     true
                 }
                 .positiveText("Choose")
@@ -149,14 +139,14 @@ class ReplayFragment : Fragment() {
     }
 
     private fun enablePlayackControls(enabled: Boolean) {
-        mBinding!!.playPauseButton.isEnabled = enabled
-        mBinding!!.seekbar.isEnabled = enabled
-        mBinding!!.speedButton.isEnabled = enabled
+        binding.playPauseButton.isEnabled = enabled
+        binding.seekbar.isEnabled = enabled
+        binding.speedButton.isEnabled = enabled
 
         if (enabled) {
-            mPlayPauseIconDrawable!!.setColor(resources.getColor(R.color.colorPrimaryDark))
+            playPauseIconDrawable.setColor(resources.getColor(R.color.colorPrimaryDark))
         } else {
-            mPlayPauseIconDrawable!!.setColor(resources.getColor(R.color.dbc_light_grey))
+            playPauseIconDrawable.setColor(resources.getColor(R.color.dbc_light_grey))
         }
     }
 }

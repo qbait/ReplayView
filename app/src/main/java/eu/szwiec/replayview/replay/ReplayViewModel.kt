@@ -33,6 +33,7 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application) 
     init {
         isPlayingLiveData.value = false
         progressLiveData.value = 0
+        eventsLiveData.value = null;
         importDataManager = ImportDataManager(application)
         playingThread = initPlayingThread()
     }
