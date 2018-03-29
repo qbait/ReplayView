@@ -21,6 +21,9 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application) 
 
     val playingTimeLiveData = MutableLiveData<String>()
     val totalTimeLiveData = MutableLiveData<String>()
+    val speedLiveData = MutableLiveData<Int>()
+
+    val speeds = listOf(1, 4, 16, 32)
 
     val availableDataTypes = Collections.unmodifiableList(Arrays.asList(ImportDataManager.TYPE_WIFI, ImportDataManager.TYPE_GPS, ImportDataManager.TYPE_BLUETOOTH, ImportDataManager.TYPE_SENSOR))
 
@@ -34,6 +37,7 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application) 
         isPlayingLiveData.value = false
         progressLiveData.value = 0
         eventsLiveData.value = null;
+        speedLiveData.value = 1
         importDataManager = ImportDataManager(application)
         playingThread = initPlayingThread()
     }
@@ -44,6 +48,19 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application) 
         } else {
             play()
         }
+    }
+
+    fun changeSpeed() {
+        val nextSpeedId: Int;
+
+        val currentSpeed = speedLiveData.value
+        val currentSpeedId = speeds.indexOf(currentSpeed)
+        if(currentSpeedId == speeds.size-1) {
+            nextSpeedId = 0
+        } else {
+            nextSpeedId = currentSpeedId + 1
+        }
+        speedLiveData.value = speeds[nextSpeedId]
     }
 
     fun zipPicked(path: String) {
@@ -86,7 +103,7 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application) 
                     } else {
                         postProgress(progress + 1)
                         try {
-                            Thread.sleep(100)
+                            Thread.sleep((500/ speedLiveData.value!!).toLong())
                         } catch (e: InterruptedException) {
                             e.printStackTrace()
                         }
@@ -108,8 +125,8 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     private fun stop() {
-        isPlayingLiveData.value = false
-        setProgress(0)
+        isPlayingLiveData.postValue(false)
+        postProgress(0)
     }
 
     fun getPlayingTime(progress: Int): String {

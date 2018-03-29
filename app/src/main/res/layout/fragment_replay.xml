@@ -25,11 +25,13 @@
             android:onClick="@{() -> viewModel.toggle()}"
             android:contentDescription="@string/play_pause_button" />
 
-        <eu.szwiec.replayview.replay.SpeedButton
+        <Button
             android:id="@+id/speed_button"
             android:layout_width="52dp"
             android:layout_height="48dp"
             android:layout_weight="0"
+            android:text="@{String.valueOf(viewModel.speedLiveData)+`x`}"
+            android:onClick="@{() -> viewModel.changeSpeed()}"
             style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:background="?selectableItemBackgroundBorderless" />
 
