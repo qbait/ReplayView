@@ -21,6 +21,9 @@ public class ReplayViewModel extends AndroidViewModel {
     private MutableLiveData<Boolean> mIsPlayingLiveData = new MutableLiveData<>();
     private MutableLiveData<Integer> mProgressLiveData = new MutableLiveData<>();
 
+    public MutableLiveData<String> mPlayingTimeLiveData = new MutableLiveData<>();
+    public MutableLiveData<String> mTotalTimeLiveData = new MutableLiveData<>();
+
     public final List<String> availableDataTypes = Collections.unmodifiableList(Arrays.asList(ImportDataManager.TYPE_WIFI, ImportDataManager.TYPE_GPS, ImportDataManager.TYPE_BLUETOOTH, ImportDataManager.TYPE_SENSOR));
 
     private CharSequence[] mPickedDataTypes;
@@ -91,7 +94,7 @@ public class ReplayViewModel extends AndroidViewModel {
     private Thread mPlayingThread;
 
     private void initPlayback() {
-        mProgressLiveData.setValue(0);
+        setProgress(0);
 
         mPlayingThread = new Thread(() -> {
             while (true) {
@@ -100,7 +103,7 @@ public class ReplayViewModel extends AndroidViewModel {
                     if(progress == 100) {
                         stop();
                     } else {
-                        mProgressLiveData.postValue( progress + 1 );
+                        postProgress(progress+1);
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException e) {
@@ -129,7 +132,7 @@ public class ReplayViewModel extends AndroidViewModel {
 
     private void stop() {
         mIsPlayingLiveData.setValue(false);
-        mProgressLiveData.setValue(0);
+        setProgress(0);
     }
 
     public String getPlayingTime(int progress) {
@@ -138,6 +141,15 @@ public class ReplayViewModel extends AndroidViewModel {
 
     public String getTotalTime() {
         return "100";
+    }
+
+    public void setProgress(int progress) {
+        mProgressLiveData.setValue(progress);
+        mPlayingTimeLiveData.setValue(getPlayingTime(progress));
+    }
+    public void postProgress(int progress) {
+        mProgressLiveData.postValue(progress);
+        mPlayingTimeLiveData.postValue(getPlayingTime(progress));
     }
 
 }

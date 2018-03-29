@@ -40,6 +40,8 @@ public class ReplayFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_replay, container, false);
+        mBinding.setLifecycleOwner(this);
+
         View view = mBinding.getRoot();
 
         mViewModel = ViewModelProviders.of(this).get(ReplayViewModel.class);
@@ -76,7 +78,6 @@ public class ReplayFragment extends Fragment {
 
         mViewModel.getProgressLiveData().observe(this, progress -> {
             mBinding.seekbar.setProgress(progress);
-            mBinding.playingTime.setText(mViewModel.getPlayingTime(progress));
         });
 
         init();
@@ -95,7 +96,7 @@ public class ReplayFragment extends Fragment {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser) {
-                    mViewModel.getProgressLiveData().setValue(seekBar.getProgress());
+                    mViewModel.setProgress(progress);
                 }
             }
 
