@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
-
     <data>
         <variable
             name="viewModel"
@@ -43,7 +42,7 @@
                 android:id="@+id/playing_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{viewModel.mPlayingTimeLiveData}"
+                android:text="@{viewModel.playingTimeLiveData}"
                 android:layout_marginTop="4dp"
                 android:textSize="12sp"
                 android:layout_alignParentTop="true"
@@ -54,7 +53,7 @@
                 android:id="@+id/total_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{viewModel.mTotalTimeLiveData}"
+                android:text="@{viewModel.totalTimeLiveData}"
                 android:layout_marginTop="4dp"
                 android:textSize="12sp"
                 android:layout_alignParentTop="true"
