@@ -60,7 +60,7 @@ class ReplayFragment : Fragment() {
             }
         })
 
-        viewModel.progressLD.observe(this, Observer { progress -> binding.seekbar.progress = progress!! })
+        viewModel.progressLD.observe(this, Observer { progress -> binding.seekbar.progress = progress!! }) //TODO look at 2 ways databinding
 
         binding.seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {

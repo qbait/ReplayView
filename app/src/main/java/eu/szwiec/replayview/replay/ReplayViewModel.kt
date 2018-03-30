@@ -19,28 +19,28 @@ class ReplayViewModel : ViewModel() {
     val availableDataTypes = Collections.unmodifiableList(Arrays.asList(ImportDataManager.TYPE_WIFI, ImportDataManager.TYPE_GPS, ImportDataManager.TYPE_BLUETOOTH, ImportDataManager.TYPE_SENSOR))
 
     var pickedDataTypes: Array<CharSequence>? = null
+    var events = emptyList<ReplayEvent>() //TODO check the best approach for collection immutability
+    var isPlaying = false
 
     val stateLD = MutableLiveData<State>()
-    val eventsLD = MutableLiveData<List<ReplayEvent>>()
-
-    val isPlayingLD = MutableLiveData<Boolean>()
     val progressLD = MutableLiveData<Int>()
-    val playingTimeLD = MutableLiveData<String>()
-    val totalTimeLD = MutableLiveData<String>()
+
+    val playingTimeLD = MutableLiveData<String>() //TODO make as BindingAdapter
+    val totalTimeLD = MutableLiveData<String>() //TODO make as BindingAdapter
+
     val speedLD = MutableLiveData<Int>()
 
     init {
         stateLD.value = State.DISABLED
-        isPlayingLD.value = false
         progressLD.value = 0
-        eventsLD.value = null;
+        events = emptyList()
         speedLD.value = 1
         importDataManager = ImportDataManager()
         playingThread = initPlayingThread()
     }
 
     fun togglePlayPause() {
-        if (isPlayingLD.value == true) {
+        if (isPlaying) {
             pause()
         } else {
             play()
@@ -86,7 +86,7 @@ class ReplayViewModel : ViewModel() {
     }
 
     private fun onSuccess(events: List<ReplayEvent>) {
-        eventsLD.value = events
+        this.events = events
         totalTimeLD.value = getTotalTime()
 
         if(events.size > 0) {
@@ -99,7 +99,7 @@ class ReplayViewModel : ViewModel() {
     private fun initPlayingThread(): Thread {
         return Thread {
             while (true) {
-                if (isPlayingLD.value!!) {
+                if (isPlaying) {
                     val progress = progressLD.value!!
                     if (progress == 100) {
                         stop()
@@ -117,18 +117,18 @@ class ReplayViewModel : ViewModel() {
     }
 
     private fun play() {
-        isPlayingLD.value = true
+        isPlaying = true
         if (playingThread.state == Thread.State.NEW) {
             playingThread.start()
         }
     }
 
     private fun pause() {
-        isPlayingLD.value = false
+        isPlaying = false
     }
 
     private fun stop() {
-        isPlayingLD.postValue(false)
+        isPlaying = false
         postProgress(0)
     }
 
@@ -137,10 +137,10 @@ class ReplayViewModel : ViewModel() {
     }
 
     fun getTotalTime(): String {
-        return eventsLD.value?.size.toString()
+        return events.size.toString()
     }
 
-    fun setProgress(progress: Int) {
+    fun setProgress(progress: Int) { //TODO get rid of it
         progressLD.value = progress
         playingTimeLD.value = getPlayingTime(progress)
     }
