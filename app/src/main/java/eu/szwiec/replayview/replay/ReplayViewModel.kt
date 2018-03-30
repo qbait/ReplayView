@@ -10,15 +10,16 @@ import kotlinx.coroutines.experimental.launch
 import java.util.*
 
 class ReplayViewModel : ViewModel() {
-    val isProcessingLiveData = MutableLiveData<Boolean>()
-    val eventsLiveData = MutableLiveData<List<ReplayEvent>>()
+    val isProgressIndicatorVisibleLD = MutableLiveData<Boolean>()
 
-    val isPlayingLiveData = MutableLiveData<Boolean>()
-    val progressLiveData = MutableLiveData<Int>()
+    val eventsLD = MutableLiveData<List<ReplayEvent>>()
 
-    val playingTimeLiveData = MutableLiveData<String>()
-    val totalTimeLiveData = MutableLiveData<String>()
-    val speedLiveData = MutableLiveData<Int>()
+    val isPlayingLD = MutableLiveData<Boolean>()
+    val progressLD = MutableLiveData<Int>()
+
+    val playingTimeLD = MutableLiveData<String>()
+    val totalTimeLD = MutableLiveData<String>()
+    val speedLD = MutableLiveData<Int>()
 
     val speeds = listOf(1, 4, 16, 32)
 
@@ -30,16 +31,16 @@ class ReplayViewModel : ViewModel() {
     private val playingThread: Thread
 
     init {
-        isPlayingLiveData.value = false
-        progressLiveData.value = 0
-        eventsLiveData.value = null;
-        speedLiveData.value = 1
+        isPlayingLD.value = false
+        progressLD.value = 0
+        eventsLD.value = null;
+        speedLD.value = 1
         importDataManager = ImportDataManager()
         playingThread = initPlayingThread()
     }
 
     fun toggle() {
-        if (isPlayingLiveData.value == true) {
+        if (isPlayingLD.value == true) {
             pause()
         } else {
             play()
@@ -49,18 +50,18 @@ class ReplayViewModel : ViewModel() {
     fun changeSpeed() {
         val nextSpeedId: Int;
 
-        val currentSpeed = speedLiveData.value
+        val currentSpeed = speedLD.value
         val currentSpeedId = speeds.indexOf(currentSpeed)
         if (currentSpeedId == speeds.size - 1) {
             nextSpeedId = 0
         } else {
             nextSpeedId = currentSpeedId + 1
         }
-        speedLiveData.value = speeds[nextSpeedId]
+        speedLD.value = speeds[nextSpeedId]
     }
 
     fun zipPicked(path: String) {
-        isProcessingLiveData.value = true
+        isProgressIndicatorVisibleLD.value = true
         importData(path, pickedDataTypes)
     }
 
@@ -75,9 +76,9 @@ class ReplayViewModel : ViewModel() {
     }
 
     private fun onSuccess(events: List<ReplayEvent>) {
-        eventsLiveData.value = events
-        isProcessingLiveData.value = false
-        totalTimeLiveData.value = getTotalTime()
+        eventsLD.value = events
+        isProgressIndicatorVisibleLD.value = false
+        totalTimeLD.value = getTotalTime()
     }
 
     fun typesPicked(pickedTypes: Array<CharSequence>) {
@@ -87,14 +88,14 @@ class ReplayViewModel : ViewModel() {
     private fun initPlayingThread(): Thread {
         return Thread {
             while (true) {
-                if (isPlayingLiveData.value!!) {
-                    val progress = progressLiveData.value!!
+                if (isPlayingLD.value!!) {
+                    val progress = progressLD.value!!
                     if (progress == 100) {
                         stop()
                     } else {
                         postProgress(progress + 1)
                         try {
-                            Thread.sleep((500 / speedLiveData.value!!).toLong())
+                            Thread.sleep((500 / speedLD.value!!).toLong())
                         } catch (e: InterruptedException) {
                             e.printStackTrace()
                         }
@@ -105,18 +106,18 @@ class ReplayViewModel : ViewModel() {
     }
 
     private fun play() {
-        isPlayingLiveData.value = true
+        isPlayingLD.value = true
         if (playingThread.state == Thread.State.NEW) {
             playingThread.start()
         }
     }
 
     private fun pause() {
-        isPlayingLiveData.value = false
+        isPlayingLD.value = false
     }
 
     private fun stop() {
-        isPlayingLiveData.postValue(false)
+        isPlayingLD.postValue(false)
         postProgress(0)
     }
 
@@ -125,16 +126,16 @@ class ReplayViewModel : ViewModel() {
     }
 
     fun getTotalTime(): String {
-        return eventsLiveData.value?.size.toString()
+        return eventsLD.value?.size.toString()
     }
 
     fun setProgress(progress: Int) {
-        progressLiveData.value = progress
-        playingTimeLiveData.value = getPlayingTime(progress)
+        progressLD.value = progress
+        playingTimeLD.value = getPlayingTime(progress)
     }
 
     fun postProgress(progress: Int) {
-        progressLiveData.postValue(progress)
-        playingTimeLiveData.postValue(getPlayingTime(progress))
+        progressLD.postValue(progress)
+        playingTimeLD.postValue(getPlayingTime(progress))
     }
 }

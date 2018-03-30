@@ -39,7 +39,7 @@ class ReplayFragment : Fragment() {
 
         val view = binding.root
 
-        viewModel.isProcessingLiveData.observe(this, Observer { isProcessing ->
+        viewModel.isProgressIndicatorVisibleLD.observe(this, Observer { isProcessing ->
             if (isProcessing!!) {
                 progressDialog.show()
             } else {
@@ -47,7 +47,7 @@ class ReplayFragment : Fragment() {
             }
         })
 
-        viewModel.eventsLiveData.observe(this, Observer { events ->
+        viewModel.eventsLD.observe(this, Observer { events ->
             if (events != null && events.size != 0) {
                 enablePlayackControls(true)
             } else {
@@ -55,7 +55,7 @@ class ReplayFragment : Fragment() {
             }
         })
 
-        viewModel.isPlayingLiveData.observe(this, Observer { isPlaying ->
+        viewModel.isPlayingLD.observe(this, Observer { isPlaying ->
             if (isPlaying!!) {
                 playPauseIconDrawable.animateToState(PAUSE)
             } else {
@@ -66,7 +66,7 @@ class ReplayFragment : Fragment() {
         playPauseIconDrawable = buildPlayPause()
         progressDialog = buildProgressDialog()
 
-        viewModel.progressLiveData.observe(this, Observer { progress -> binding.seekbar.progress = progress!! })
+        viewModel.progressLD.observe(this, Observer { progress -> binding.seekbar.progress = progress!! })
 
         binding.pickFileButton.setOnClickListener { v -> buildDataTypeDialog().show() }
 
