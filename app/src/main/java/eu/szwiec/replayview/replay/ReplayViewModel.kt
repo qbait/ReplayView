@@ -36,7 +36,7 @@ class ReplayViewModel : ViewModel() {
         importDataManager = ImportDataManager()
         playingThread = initPlayingThread()
 
-        progressLD.observeForever({ progress -> playingTimeLD.value = formatPlayingTime(progress) })
+        progressLD.observeForever({ progress -> playingTimeLD.value = formatPlayingTime(progress) }) //TODO checkout if observeForever won't leak
         eventsLD.observeForever({ events -> totalTimeLD.value = formatTotalTime(events) })
     }
 
