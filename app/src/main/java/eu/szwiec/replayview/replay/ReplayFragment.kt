@@ -65,7 +65,7 @@ class ReplayFragment : Fragment() {
         binding.seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    viewModel.setProgress(progress)
+                    viewModel.progressLD.value = progress
                 }
             }
 
