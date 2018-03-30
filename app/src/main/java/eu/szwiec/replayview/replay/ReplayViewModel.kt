@@ -8,25 +8,23 @@ import org.jetbrains.anko.coroutines.experimental.bg
 import java.util.*
 
 class ReplayViewModel : ViewModel() {
+    val importDataManager: ImportDataManager
+    val playingThread: Thread
+
+    val speeds = listOf(1, 4, 16, 32)
+    val availableDataTypes = Collections.unmodifiableList(Arrays.asList(ImportDataManager.TYPE_WIFI, ImportDataManager.TYPE_GPS, ImportDataManager.TYPE_BLUETOOTH, ImportDataManager.TYPE_SENSOR))
+
+    var pickedDataTypes: Array<CharSequence>? = null
+
     val isProgressIndicatorVisibleLD = MutableLiveData<Boolean>()
 
     val eventsLD = MutableLiveData<List<ReplayEvent>>()
 
     val isPlayingLD = MutableLiveData<Boolean>()
     val progressLD = MutableLiveData<Int>()
-
     val playingTimeLD = MutableLiveData<String>()
     val totalTimeLD = MutableLiveData<String>()
     val speedLD = MutableLiveData<Int>()
-
-    val speeds = listOf(1, 4, 16, 32)
-
-    val availableDataTypes = Collections.unmodifiableList(Arrays.asList(ImportDataManager.TYPE_WIFI, ImportDataManager.TYPE_GPS, ImportDataManager.TYPE_BLUETOOTH, ImportDataManager.TYPE_SENSOR))
-
-    private var pickedDataTypes: Array<CharSequence>? = null
-    private val importDataManager: ImportDataManager
-
-    private val playingThread: Thread
 
     init {
         isPlayingLD.value = false
