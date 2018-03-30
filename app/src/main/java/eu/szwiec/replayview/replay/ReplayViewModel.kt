@@ -11,13 +11,16 @@ class ReplayViewModel : ViewModel() {
     val importDataManager: ImportDataManager
     val playingThread: Thread
 
+    enum class State {
+        DISABLED, PICKING_TYPE, PICKING_FILE, PROCESSING, ENABLED, ERROR
+    }
+
     val speeds = listOf(1, 4, 16, 32)
     val availableDataTypes = Collections.unmodifiableList(Arrays.asList(ImportDataManager.TYPE_WIFI, ImportDataManager.TYPE_GPS, ImportDataManager.TYPE_BLUETOOTH, ImportDataManager.TYPE_SENSOR))
 
     var pickedDataTypes: Array<CharSequence>? = null
 
-    val isProgressIndicatorVisibleLD = MutableLiveData<Boolean>()
-
+    val stateLD = MutableLiveData<State>()
     val eventsLD = MutableLiveData<List<ReplayEvent>>()
 
     val isPlayingLD = MutableLiveData<Boolean>()
@@ -27,6 +30,7 @@ class ReplayViewModel : ViewModel() {
     val speedLD = MutableLiveData<Int>()
 
     init {
+        stateLD.value = State.DISABLED
         isPlayingLD.value = false
         progressLD.value = 0
         eventsLD.value = null;
@@ -35,7 +39,7 @@ class ReplayViewModel : ViewModel() {
         playingThread = initPlayingThread()
     }
 
-    fun toggle() {
+    fun togglePlayPause() {
         if (isPlayingLD.value == true) {
             pause()
         } else {
@@ -56,8 +60,21 @@ class ReplayViewModel : ViewModel() {
         speedLD.value = speeds[nextSpeedId]
     }
 
-    fun zipPicked(path: String) {
-        isProgressIndicatorVisibleLD.value = true
+
+    fun onOpenButtonClick() {
+        stateLD.value = State.PICKING_TYPE
+    }
+
+    fun setPickedTypes(types: Array<CharSequence>?) {
+        pickedDataTypes = types
+    }
+
+    fun onTypePicked() {
+        stateLD.value = State.PICKING_FILE
+    }
+
+    fun onFilePicked(path: String) {
+        stateLD.value = State.PROCESSING
         importData(path, pickedDataTypes)
     }
 
@@ -70,12 +87,13 @@ class ReplayViewModel : ViewModel() {
 
     private fun onSuccess(events: List<ReplayEvent>) {
         eventsLD.value = events
-        isProgressIndicatorVisibleLD.value = false
         totalTimeLD.value = getTotalTime()
-    }
 
-    fun typesPicked(pickedTypes: Array<CharSequence>) {
-        pickedDataTypes = pickedTypes
+        if(events.size > 0) {
+            stateLD.value = State.ENABLED
+        } else {
+            stateLD.value = State.ERROR
+        }
     }
 
     private fun initPlayingThread(): Thread {

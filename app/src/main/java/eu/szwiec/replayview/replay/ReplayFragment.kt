@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
+import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
 import com.github.angads25.filepicker.model.DialogConfigs
 import com.github.angads25.filepicker.model.DialogProperties
@@ -22,7 +23,10 @@ class ReplayFragment : Fragment() {
 
     private lateinit var viewModel: ReplayViewModel
     private lateinit var binding: FragmentReplayBinding
+
     private lateinit var progressDialog: MaterialDialog
+    private lateinit var typePickerDialog: MaterialDialog
+    private lateinit var filePickerDialog: FilePickerDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_replay, container, false)
@@ -34,27 +38,29 @@ class ReplayFragment : Fragment() {
 
         val view = binding.root
 
-        viewModel.isProgressIndicatorVisibleLD.observe(this, Observer { isProcessing ->
-            if (isProcessing!!) {
-                progressDialog.show()
-            } else {
-                progressDialog.dismiss()
-            }
-        })
-
-        viewModel.eventsLD.observe(this, Observer { events ->
-            if (events != null && events.size != 0) {
-                enablePlayackControls(true)
-            } else {
-                enablePlayackControls(false)
-            }
-        })
-
         progressDialog = buildProgressDialog()
+        typePickerDialog = buildTypePickerDialog()
+        filePickerDialog = buildFilePickerDialog()
+
+        viewModel.stateLD.observe(this, Observer { state ->
+            when(state) {
+                ReplayViewModel.State.DISABLED -> enablePlayackControls(false)
+                ReplayViewModel.State.PICKING_TYPE -> typePickerDialog.show()
+                ReplayViewModel.State.PICKING_FILE -> filePickerDialog.show()
+                ReplayViewModel.State.PROCESSING -> progressDialog.show()
+                ReplayViewModel.State.ENABLED -> {
+                    progressDialog.dismiss()
+                    enablePlayackControls(true)
+                }
+                ReplayViewModel.State.ERROR -> {
+                    progressDialog.dismiss()
+                    enablePlayackControls(false)
+                    Toast.makeText(activity, "Something went wrong", Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
 
         viewModel.progressLD.observe(this, Observer { progress -> binding.seekbar.progress = progress!! })
-
-        binding.pickFileButton.setOnClickListener { v -> buildDataTypeDialog().show() }
 
         binding.seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
@@ -91,22 +97,21 @@ class ReplayFragment : Fragment() {
         val filePickerDialog = FilePickerDialog(context, properties)
         filePickerDialog.setTitle("Select a File")
 
-        filePickerDialog.setDialogSelectionListener { files -> viewModel.zipPicked(files[0]) }
+        filePickerDialog.setDialogSelectionListener { files -> viewModel.onFilePicked(files[0]) }
 
         return filePickerDialog
     }
 
-    private fun buildDataTypeDialog(): MaterialDialog {
-
+    private fun buildTypePickerDialog(): MaterialDialog {
         return MaterialDialog.Builder(context!!)
                 .title("Choose data type")
                 .items(viewModel.availableDataTypes)
-                .itemsCallbackMultiChoice(null) { dialog, which, text ->
-                    viewModel.typesPicked(text)
+                .itemsCallbackMultiChoice(null) { dialog, which, types ->
+                    viewModel.setPickedTypes(types)
                     true
                 }
                 .positiveText("Choose")
-                .onPositive { dialog, which -> buildFilePickerDialog().show() }
+                .onPositive { dialog, which -> viewModel.onTypePicked() }
                 .build()
     }
 
