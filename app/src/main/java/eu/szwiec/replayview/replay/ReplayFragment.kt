@@ -6,7 +6,6 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.os.Environment
 import android.support.v4.app.Fragment
-import android.support.v4.view.animation.FastOutSlowInInterpolator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,16 +16,12 @@ import com.github.angads25.filepicker.model.DialogProperties
 import com.github.angads25.filepicker.view.FilePickerDialog
 import eu.szwiec.replayview.R
 import eu.szwiec.replayview.databinding.FragmentReplayBinding
-import rm.com.youtubeplayicon.PlayIconDrawable
-import rm.com.youtubeplayicon.PlayIconDrawable.IconState.PAUSE
-import rm.com.youtubeplayicon.PlayIconDrawable.IconState.PLAY
 import java.io.File
 
 class ReplayFragment : Fragment() {
 
     private lateinit var viewModel: ReplayViewModel
     private lateinit var binding: FragmentReplayBinding
-    private lateinit var playPauseIconDrawable: PlayIconDrawable
     private lateinit var progressDialog: MaterialDialog
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -55,15 +50,6 @@ class ReplayFragment : Fragment() {
             }
         })
 
-        viewModel.isPlayingLD.observe(this, Observer { isPlaying ->
-            if (isPlaying!!) {
-                playPauseIconDrawable.animateToState(PAUSE)
-            } else {
-                playPauseIconDrawable.animateToState(PLAY)
-            }
-        })
-
-        playPauseIconDrawable = buildPlayPause()
         progressDialog = buildProgressDialog()
 
         viewModel.progressLD.observe(this, Observer { progress -> binding.seekbar.progress = progress!! })
@@ -91,15 +77,6 @@ class ReplayFragment : Fragment() {
                 .cancelable(false)
                 .build()
     }
-
-    private fun buildPlayPause(): PlayIconDrawable {
-        return PlayIconDrawable.builder()
-                .withInterpolator(FastOutSlowInInterpolator())
-                .withDuration(300)
-                .withInitialState(PLAY)
-                .into(binding.playPauseButton)
-    }
-
 
     private fun buildFilePickerDialog(): FilePickerDialog {
         val properties = DialogProperties()
@@ -137,11 +114,5 @@ class ReplayFragment : Fragment() {
         binding.playPauseButton.isEnabled = enabled
         binding.seekbar.isEnabled = enabled
         binding.speedButton.isEnabled = enabled
-
-        if (enabled) {
-            playPauseIconDrawable.setColor(resources.getColor(R.color.colorPrimaryDark))
-        } else {
-            playPauseIconDrawable.setColor(resources.getColor(R.color.dbc_light_grey))
-        }
     }
 }

@@ -37,7 +37,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    implementation 'com.github.alxrm:youtube-play-icon:0.9'
     implementation 'com.github.angads25:filepicker:1.1.1'
     implementation 'com.afollestad.material-dialogs:core:0.9.4.5'
     api 'com.jakewharton.timber:timber:4.6.0'

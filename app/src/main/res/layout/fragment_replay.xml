@@ -14,16 +14,17 @@
         android:paddingTop="4dp"
         android:paddingBottom="4dp">
 
-        <ImageButton
+        <ToggleButton
             android:id="@+id/play_pause_button"
-            android:background="?selectableItemBackgroundBorderless"
             android:padding="8dp"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_weight="0"
             android:layout_marginStart="8dp"
             android:onClick="@{() -> viewModel.toggle()}"
-            android:contentDescription="@string/play_pause_button" />
+            android:background="@drawable/play_pause_toggle"
+            android:textOff=""
+            android:textOn=""/>
 
         <Button
             android:id="@+id/speed_button"
