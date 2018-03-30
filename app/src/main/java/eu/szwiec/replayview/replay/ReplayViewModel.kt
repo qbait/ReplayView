@@ -2,11 +2,9 @@ package eu.szwiec.replayview.replay
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
+import org.jetbrains.anko.coroutines.experimental.bg
 import java.util.*
 
 class ReplayViewModel : ViewModel() {
@@ -66,11 +64,8 @@ class ReplayViewModel : ViewModel() {
     }
 
     private fun importData(path: String, pickedDataTypes: Array<CharSequence>?) {
-
-        launch(UI) {
-            val replayEvents: Deferred<List<ReplayEvent>> = async(CommonPool) {
-                importDataManager.importData(path, pickedDataTypes)
-            }
+        async(UI) {
+            val replayEvents = bg { importDataManager.importData(path, pickedDataTypes) }
             onSuccess(replayEvents.await())
         }
     }
