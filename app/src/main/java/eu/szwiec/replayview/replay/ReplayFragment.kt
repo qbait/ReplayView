@@ -24,9 +24,9 @@ class ReplayFragment : Fragment(), AnkoLogger {
     private lateinit var viewModel: ReplayViewModel
     private lateinit var binding: FragmentReplayBinding
 
-    private lateinit var progressDialog: MaterialDialog
-    private lateinit var typePickerDialog: MaterialDialog
-    private lateinit var filePickerDialog: FilePickerDialog
+    private val progressDialog: MaterialDialog by lazy { buildProgressDialog() }
+    private val typePickerDialog: MaterialDialog by lazy { buildTypePickerDialog() }
+    private val filePickerDialog: FilePickerDialog by lazy { buildFilePickerDialog() }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_replay, container, false)
@@ -38,12 +38,8 @@ class ReplayFragment : Fragment(), AnkoLogger {
 
         val view = binding.root
 
-        progressDialog = buildProgressDialog()
-        typePickerDialog = buildTypePickerDialog()
-        filePickerDialog = buildFilePickerDialog()
-
         viewModel.stateLD.observe(this, Observer { state ->
-            when(state) {
+            when (state) {
                 ReplayViewModel.State.PICKING_TYPE -> typePickerDialog.show()
                 ReplayViewModel.State.PICKING_FILE -> filePickerDialog.show()
                 ReplayViewModel.State.PROCESSING -> progressDialog.show()

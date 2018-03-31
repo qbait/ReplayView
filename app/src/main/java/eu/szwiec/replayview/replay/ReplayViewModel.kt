@@ -22,8 +22,8 @@ class ReplayViewModel : ViewModel() {
     val stateLD = NonNullLiveData(State.NOT_READY)
     val progressLD = NonNullLiveData(0)
     val speedLD = NonNullLiveData(speeds[0])
-    var eventsLD = NonNullLiveData(emptyList<ReplayEvent>())
-    var isPlayingLD = NonNullLiveData(false)
+    val eventsLD = NonNullLiveData(emptyList<ReplayEvent>())
+    val isPlayingLD = NonNullLiveData(false)
 
     val playingTimeLD = Transformations.map(progressLD, { progress -> formatPlayingTime(progress, eventsLD.value) })
     val totalTimeLD = Transformations.map(eventsLD, { events -> formatTotalTime(events) })
