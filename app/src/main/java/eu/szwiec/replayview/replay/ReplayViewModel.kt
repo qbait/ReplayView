@@ -8,9 +8,6 @@ import org.apache.commons.lang3.time.DurationFormatUtils
 import org.jetbrains.anko.coroutines.experimental.bg
 
 class ReplayViewModel : ViewModel() {
-    val importDataManager: ImportDataManager
-    val playingThread: Thread
-
     enum class State {
         NOT_READY, PICKING_TYPE, PICKING_FILE, PROCESSING, READY, ERROR
     }
@@ -18,13 +15,15 @@ class ReplayViewModel : ViewModel() {
     val speeds = listOf(1, 4, 16, 32)
     val availableDataTypes = listOf(ImportDataManager.TYPE_WIFI, ImportDataManager.TYPE_GPS, ImportDataManager.TYPE_BLUETOOTH, ImportDataManager.TYPE_SENSOR)
 
+    val importDataManager: ImportDataManager
+    val playingThread: Thread
     var pickedDataTypes: Array<CharSequence> = emptyArray()
 
-    val stateLD = MutableLiveData<State>() //TODO check LiveData nullability
-    val progressLD = MutableLiveData<Int>()
-    val speedLD = MutableLiveData<Int>()
-    var eventsLD = MutableLiveData<List<ReplayEvent>>()
-    var isPlayingLD = MutableLiveData<Boolean>()
+    val stateLD = NonNullLiveData(State.NOT_READY)
+    val progressLD = NonNullLiveData(0)
+    val speedLD = NonNullLiveData(speeds[0])
+    var eventsLD = NonNullLiveData(emptyList<ReplayEvent>())
+    var isPlayingLD = NonNullLiveData(false)
 
     val playingTimeLD = MutableLiveData<String>()
     val totalTimeLD = MutableLiveData<String>()
@@ -35,22 +34,16 @@ class ReplayViewModel : ViewModel() {
         importDataManager = ImportDataManager()
         playingThread = initPlayingThread()
 
-        stateLD.value = State.NOT_READY
-        progressLD.value = 0
-        speedLD.value = 1
-        eventsLD.value = emptyList()
-        isPlayingLD.value = false
-
-        progressLD.observeForever({ progress -> playingTimeLD.value = formatPlayingTime(progress!!, eventsLD.value!!) }) //TODO checkout if observeForever won't leak
-        eventsLD.observeForever({ events ->
-            totalTimeLD.value = formatTotalTime(events!!)
-            maxProgressLD.value = eventsLD.value!!.size - 1
-        })
+        progressLD.observeForever { playingTimeLD.value = formatPlayingTime(progressLD.value, eventsLD.value) } //TODO checkout if observeForever won't leak
+        eventsLD.observeForever {
+            totalTimeLD.value = formatTotalTime(eventsLD.value)
+            maxProgressLD.value = eventsLD.value.size - 1
+        }
         stateLD.observeForever({ state -> isPlayingEnabledLD.value = state == State.READY })
     }
 
     fun togglePlayPause() {
-        if (isPlayingLD.value!!) {
+        if (isPlayingLD.value) {
             pause()
         } else {
             play()
@@ -122,7 +115,7 @@ class ReplayViewModel : ViewModel() {
     }
 
     fun dialogDismissed() {
-        if (eventsLD.value!!.size > 0)
+        if (eventsLD.value.size > 0)
             stateLD.value = State.READY
         else
             stateLD.value = State.NOT_READY
@@ -131,9 +124,9 @@ class ReplayViewModel : ViewModel() {
     private fun initPlayingThread(): Thread {
         return Thread {
             while (true) {
-                if (isPlayingLD.value!!) {
-                    val progress = progressLD.value!!
-                    val events = eventsLD.value!!
+                if (isPlayingLD.value) {
+                    val progress = progressLD.value
+                    val events = eventsLD.value
                     val event = events.get(progress)
 
                     //TODO post on the BUS
@@ -143,7 +136,7 @@ class ReplayViewModel : ViewModel() {
                     } else {
                         progressLD.postValue(progress + 1)
                         val diffTimeMs = events.get(progress + 1).msTimestamp() - events.get(progress).msTimestamp()
-                        Thread.sleep(diffTimeMs / speedLD.value!!)
+                        Thread.sleep(diffTimeMs / speedLD.value)
                     }
                 }
             }
