@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModel
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import org.jetbrains.anko.coroutines.experimental.bg
-import java.util.*
 
 class ReplayViewModel : ViewModel() {
     val importDataManager: ImportDataManager
@@ -16,12 +15,12 @@ class ReplayViewModel : ViewModel() {
     }
 
     val speeds = listOf(1, 4, 16, 32)
-    val availableDataTypes = Collections.unmodifiableList(Arrays.asList(ImportDataManager.TYPE_WIFI, ImportDataManager.TYPE_GPS, ImportDataManager.TYPE_BLUETOOTH, ImportDataManager.TYPE_SENSOR))
+    val availableDataTypes = listOf(ImportDataManager.TYPE_WIFI, ImportDataManager.TYPE_GPS, ImportDataManager.TYPE_BLUETOOTH, ImportDataManager.TYPE_SENSOR)
 
-    var pickedDataTypes: Array<CharSequence>? = null
+    var pickedDataTypes: Array<CharSequence> = emptyArray()
     var isPlaying = false
 
-    val stateLD = MutableLiveData<State>()
+    val stateLD = MutableLiveData<State>() //TODO check LiveData nullability
     val progressLD = MutableLiveData<Int>()
     val speedLD = MutableLiveData<Int>()
     var eventsLD = MutableLiveData<List<ReplayEvent>>()
@@ -66,7 +65,7 @@ class ReplayViewModel : ViewModel() {
         stateLD.value = State.PICKING_TYPE
     }
 
-    fun setPickedTypes(types: Array<CharSequence>?) {
+    fun setPickedTypes(types: Array<CharSequence>) {
         pickedDataTypes = types
     }
 
@@ -79,7 +78,7 @@ class ReplayViewModel : ViewModel() {
         importData(path, pickedDataTypes)
     }
 
-    private fun importData(path: String, pickedDataTypes: Array<CharSequence>?) {
+    private fun importData(path: String, pickedDataTypes: Array<CharSequence>) {
         async(UI) {
             val replayEvents = bg { importDataManager.importData(path, pickedDataTypes) }
             onPostExecute(replayEvents.await())
