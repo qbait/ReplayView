@@ -43,17 +43,12 @@ class ReplayFragment : Fragment() {
 
         viewModel.stateLD.observe(this, Observer { state ->
             when(state) {
-                ReplayViewModel.State.DISABLED -> enablePlayackControls(false)
                 ReplayViewModel.State.PICKING_TYPE -> typePickerDialog.show()
                 ReplayViewModel.State.PICKING_FILE -> filePickerDialog.show()
                 ReplayViewModel.State.PROCESSING -> progressDialog.show()
-                ReplayViewModel.State.ENABLED -> {
-                    progressDialog.dismiss()
-                    enablePlayackControls(true)
-                }
+                ReplayViewModel.State.READY -> progressDialog.dismiss()
                 ReplayViewModel.State.ERROR -> {
                     progressDialog.dismiss()
-                    enablePlayackControls(false)
                     Toast.makeText(activity, "Something went wrong", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -84,6 +79,7 @@ class ReplayFragment : Fragment() {
         filePickerDialog.setTitle("Select a File")
 
         filePickerDialog.setDialogSelectionListener { files -> viewModel.onFilePicked(files[0]) }
+        filePickerDialog.setOnDismissListener({ viewModel.dialogDismissed() })
 
         return filePickerDialog
     }
@@ -96,14 +92,9 @@ class ReplayFragment : Fragment() {
                     viewModel.setPickedTypes(types)
                     true
                 }
+                .dismissListener { viewModel.dialogDismissed() }
                 .positiveText("Choose")
                 .onPositive { dialog, which -> viewModel.onTypePicked() }
                 .build()
-    }
-
-    private fun enablePlayackControls(enabled: Boolean) {
-        binding.playPauseButton.isEnabled = enabled
-        binding.seekbar.isEnabled = enabled
-        binding.speedButton.isEnabled = enabled
     }
 }

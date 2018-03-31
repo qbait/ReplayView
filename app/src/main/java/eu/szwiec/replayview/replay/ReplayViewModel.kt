@@ -11,7 +11,7 @@ class ReplayViewModel : ViewModel() {
     val playingThread: Thread
 
     enum class State {
-        DISABLED, PICKING_TYPE, PICKING_FILE, PROCESSING, ENABLED, ERROR
+        NOT_READY, PICKING_TYPE, PICKING_FILE, PROCESSING, READY, ERROR
     }
 
     val speeds = listOf(1, 4, 16, 32)
@@ -27,16 +27,20 @@ class ReplayViewModel : ViewModel() {
 
     val playingTimeLD = MutableLiveData<String>()
     val totalTimeLD = MutableLiveData<String>()
+    val isPlayingEnabledLD = MutableLiveData<Boolean>()
 
     init {
-        stateLD.value = State.ENABLED
-        progressLD.value = 0
-        speedLD.value = 1
         importDataManager = ImportDataManager()
         playingThread = initPlayingThread()
 
+        stateLD.value = State.NOT_READY
+        progressLD.value = 0
+        speedLD.value = 1
+        eventsLD.value = emptyList()
+
         progressLD.observeForever({ progress -> playingTimeLD.value = formatPlayingTime(progress) }) //TODO checkout if observeForever won't leak
         eventsLD.observeForever({ events -> totalTimeLD.value = formatTotalTime(events) })
+        stateLD.observeForever({ state -> isPlayingEnabledLD.value = state == State.READY })
     }
 
     fun togglePlayPause() {
@@ -89,7 +93,7 @@ class ReplayViewModel : ViewModel() {
         eventsLD.value = events
 
         if (events.size > 0) {
-            stateLD.value = State.ENABLED
+            stateLD.value = State.READY
         } else {
             stateLD.value = State.ERROR
         }
@@ -137,5 +141,12 @@ class ReplayViewModel : ViewModel() {
 
     private fun formatTotalTime(events: List<ReplayEvent>?): String {
         return events?.size.toString()
+    }
+
+    fun dialogDismissed() {
+        if(eventsLD.value!!.size > 0)
+            stateLD.value = State.READY
+        else
+            stateLD.value = State.NOT_READY
     }
 }
