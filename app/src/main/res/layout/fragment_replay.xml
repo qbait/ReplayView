@@ -24,6 +24,7 @@
             android:onClick="@{() -> viewModel.togglePlayPause()}"
             android:background="@drawable/play_pause_toggle"
             android:enabled="@{viewModel.isPlayingEnabledLD}"
+            android:checked="@{viewModel.isPlayingLD()}"
             android:textOff=""
             android:textOn=""/>
 
@@ -75,7 +76,7 @@
                 android:layout_alignParentBottom="true"
                 android:enabled="@{viewModel.isPlayingEnabledLD}"
                 android:progress="@={viewModel.progressLD}"
-                android:max="@{viewModel.eventsLD.size()-1}"
+                android:max="@{viewModel.maxProgressLD}"
                 />
 
         </RelativeLayout>
