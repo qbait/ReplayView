@@ -77,15 +77,7 @@ public class ImportDataManager {
         }
 
         if (dataTypesList.size() > 1) {
-            Collections.sort(mData, (o1, o2) -> {
-                if (o1.getNanoTimestamp() > o2.getNanoTimestamp()) {
-                    return 1;
-                } else if (o1.getNanoTimestamp() < o2.getNanoTimestamp()) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            });
+            Collections.sort(mData, (o1, o2) -> Long.compare(o1.getNanoTimestamp(), o2.getNanoTimestamp()));
         }
 
         return mData;
