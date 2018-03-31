@@ -16,9 +16,10 @@ import com.github.angads25.filepicker.model.DialogProperties
 import com.github.angads25.filepicker.view.FilePickerDialog
 import eu.szwiec.replayview.R
 import eu.szwiec.replayview.databinding.FragmentReplayBinding
+import org.jetbrains.anko.AnkoLogger
 import java.io.File
 
-class ReplayFragment : Fragment() {
+class ReplayFragment : Fragment(), AnkoLogger {
 
     private lateinit var viewModel: ReplayViewModel
     private lateinit var binding: FragmentReplayBinding
