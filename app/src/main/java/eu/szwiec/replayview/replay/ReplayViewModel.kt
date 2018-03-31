@@ -1,6 +1,6 @@
 package eu.szwiec.replayview.replay
 
-import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
@@ -25,21 +25,14 @@ class ReplayViewModel : ViewModel() {
     var eventsLD = NonNullLiveData(emptyList<ReplayEvent>())
     var isPlayingLD = NonNullLiveData(false)
 
-    val playingTimeLD = MutableLiveData<String>()
-    val totalTimeLD = MutableLiveData<String>()
-    val maxProgressLD = MutableLiveData<Int>()
-    val isPlayingEnabledLD = MutableLiveData<Boolean>()
+    val playingTimeLD = Transformations.map(progressLD, { progress -> formatPlayingTime(progress, eventsLD.value) })
+    val totalTimeLD = Transformations.map(eventsLD, { events -> formatTotalTime(events) })
+    val maxProgressLD = Transformations.map(eventsLD, { events -> events.size - 1 })
+    val isPlayingEnabledLD = Transformations.map(stateLD, { state -> state == State.READY })
 
     init {
         importDataManager = ImportDataManager()
         playingThread = initPlayingThread()
-
-        progressLD.observeForever { playingTimeLD.value = formatPlayingTime(progressLD.value, eventsLD.value) } //TODO checkout if observeForever won't leak
-        eventsLD.observeForever {
-            totalTimeLD.value = formatTotalTime(eventsLD.value)
-            maxProgressLD.value = eventsLD.value.size - 1
-        }
-        stateLD.observeForever({ state -> isPlayingEnabledLD.value = state == State.READY })
     }
 
     fun togglePlayPause() {
