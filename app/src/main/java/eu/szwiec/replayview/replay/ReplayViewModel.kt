@@ -4,7 +4,9 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
+import org.apache.commons.lang3.time.DurationFormatUtils
 import org.jetbrains.anko.coroutines.experimental.bg
+import timber.log.Timber
 
 class ReplayViewModel : ViewModel() {
     val importDataManager: ImportDataManager
@@ -38,8 +40,8 @@ class ReplayViewModel : ViewModel() {
         speedLD.value = 1
         eventsLD.value = emptyList()
 
-        progressLD.observeForever({ progress -> playingTimeLD.value = formatPlayingTime(progress) }) //TODO checkout if observeForever won't leak
-        eventsLD.observeForever({ events -> totalTimeLD.value = formatTotalTime(events) })
+        progressLD.observeForever({ progress -> playingTimeLD.value = formatPlayingTime(progress!!, eventsLD.value!!) }) //TODO checkout if observeForever won't leak
+        eventsLD.observeForever({ events -> totalTimeLD.value = formatTotalTime(events!!) })
         stateLD.observeForever({ state -> isPlayingEnabledLD.value = state == State.READY })
     }
 
@@ -99,26 +101,6 @@ class ReplayViewModel : ViewModel() {
         }
     }
 
-    private fun initPlayingThread(): Thread {
-        return Thread {
-            while (true) {
-                if (isPlaying) {
-                    val progress = progressLD.value!!
-                    if (progress == 100) {
-                        stop()
-                    } else {
-                        progressLD.postValue(progress + 1)
-                        try {
-                            Thread.sleep((500 / speedLD.value!!).toLong())
-                        } catch (e: InterruptedException) {
-                            e.printStackTrace()
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     private fun play() {
         isPlaying = true
         if (playingThread.state == Thread.State.NEW) {
@@ -135,18 +117,54 @@ class ReplayViewModel : ViewModel() {
         progressLD.value = 0
     }
 
-    private fun formatPlayingTime(progress: Int?): String {
-        return progress.toString()
-    }
-
-    private fun formatTotalTime(events: List<ReplayEvent>?): String {
-        return events?.size.toString()
-    }
-
     fun dialogDismissed() {
         if(eventsLD.value!!.size > 0)
             stateLD.value = State.READY
         else
             stateLD.value = State.NOT_READY
+    }
+
+    private fun initPlayingThread(): Thread {
+        return Thread {
+            while (progressLD.value!! < eventsLD.value!!.size!! - 1) {
+                if (isPlaying) {
+                    val progress = progressLD.value!!
+                    val events = eventsLD.value!!
+                    val event = events.get(progress)
+
+                    Timber.d("REPLAY post event: %s", event) //TODO post on the BUS
+
+                    if (progress == events.size) {
+                        stop()
+                    } else {
+                        progressLD.postValue(progress + 1)
+                        val diffTimeMs = events.get(progress + 1).msTimestamp() - events.get(progress).msTimestamp()
+                        Thread.sleep(diffTimeMs / speedLD.value!!)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun formatPlayingTime(progress: Int, events: List<ReplayEvent>): String {
+        if (events.size == 0) return ""
+
+        val firstTimestamp = events.get(0).msTimestamp()
+        val currentTimestamp = events.get(progress).msTimestamp()
+
+        return format(currentTimestamp - firstTimestamp)
+    }
+
+    private fun formatTotalTime(events: List<ReplayEvent>): String {
+        if (events.size == 0) return ""
+
+        val firstTimestamp = events.get(0).msTimestamp()
+        val lastTimestamp = events.get(events.size-1).msTimestamp()
+
+        return format(lastTimestamp - firstTimestamp)
+    }
+
+    fun format(timestampMs: Long): String {
+        return DurationFormatUtils.formatDuration(timestampMs, "mm:ss")
     }
 }

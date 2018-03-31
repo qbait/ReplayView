@@ -75,7 +75,7 @@
                 android:layout_alignParentBottom="true"
                 android:enabled="@{viewModel.isPlayingEnabledLD}"
                 android:progress="@={viewModel.progressLD}"
-                android:max="@{viewModel.eventsLD.size()}"
+                android:max="@{viewModel.eventsLD.size()-1}"
                 />
 
         </RelativeLayout>
