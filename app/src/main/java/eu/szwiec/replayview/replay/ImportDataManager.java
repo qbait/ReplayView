@@ -1,6 +1,5 @@
 package eu.szwiec.replayview.replay;
 
-import android.content.Context;
 import android.location.Location;
 
 import com.annimon.stream.IntStream;
@@ -27,7 +26,6 @@ import eu.szwiec.replayview.otto.EddystoneUidPacketEvent;
 import eu.szwiec.replayview.otto.NvGeofenceEvent;
 import eu.szwiec.replayview.otto.SDKWifiScanResultEvent;
 import eu.szwiec.replayview.otto.SensorArrayValuesEvent;
-import timber.log.Timber;
 
 /**
  * Created by szwiec on 07/07/2017.
@@ -41,7 +39,7 @@ public class ImportDataManager {
     static final String TYPE_WIFI = "wifi";
 
     private File mDir;
-    private List<ReplayEvent> mData = new ArrayList<>();
+    private final List<ReplayEvent> mData = new ArrayList<>();
 
     public List<ReplayEvent> importData(String zipPath, CharSequence[] dataTypes) throws IOException {
 
@@ -161,8 +159,7 @@ public class ImportDataManager {
     }
 
     private BufferedReader getReader(File file) throws FileNotFoundException {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        return reader;
+        return new BufferedReader(new FileReader(file));
     }
 
     private void importWifi(File file) throws IOException {
@@ -198,7 +195,6 @@ public class ImportDataManager {
                     Long.parseLong(wifiParts[1]),
                     Integer.parseInt(wifiParts[2]),
                     macAddr, strMacAddr, rss, true, 0);
-            Timber.d("sim %s", event.toString());
 
             mData.add(event);
         }
