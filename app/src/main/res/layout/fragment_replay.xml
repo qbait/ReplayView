@@ -37,7 +37,7 @@
             android:onClick="@{() -> viewModel.changeSpeed()}"
             style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:enabled="@{viewModel.isPlayingEnabledLD}"
-            android:background="?selectableItemBackgroundBorderless" />
+            android:background="?attr/selectableItemBackgroundBorderless" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -88,7 +88,7 @@
             android:layout_weight="0"
             android:src="@drawable/ic_pick_file"
             android:padding="12dp"
-            android:background="?selectableItemBackgroundBorderless"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_marginEnd="8dp"
             android:onClick="@{() -> viewModel.onOpenButtonClick()}"
             android:contentDescription="@string/pick_file_button" />
