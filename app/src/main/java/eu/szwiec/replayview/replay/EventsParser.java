@@ -31,7 +31,7 @@ public class EventsParser {
         this.files = files;
     }
 
-    public static List<ReplayEvent> getEventsSortedByTimestamp(List<File> files) {
+    public static List<ReplayEvent> getEvents(List<File> files) {
         EventsParser parser = new EventsParser(files);
 
         List<ReplayEvent> allEvents = parser.getAllEvents();
