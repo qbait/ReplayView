@@ -39,7 +39,7 @@ public class ImportDataManager {
     public static final String TYPE_WIFI = "wifi";
 
     private File mDir;
-    private final List<ReplayEvent> mData = new ArrayList<>();
+    public static final List<ReplayEvent>  mData = new ArrayList<>();
 
     public List<ReplayEvent> importData(String zipPath, CharSequence[] dataTypes) throws IOException {
 
@@ -54,13 +54,13 @@ public class ImportDataManager {
 
         if (dataTypesList.contains(TYPE_WIFI)) {
             for (File file : getFiles("wifi")) {
-                importWifi(file);
+                mData.addAll( getWifiEvents(file) );
             }
         }
 
         if (dataTypesList.contains(TYPE_BLUETOOTH)) {
             for (File file : getFiles("edyuid")) {
-                importBluetooth(file);
+                mData.addAll( getBluetoothEvents(file) );
             }
         }
 
@@ -131,9 +131,11 @@ public class ImportDataManager {
         }
     }
 
-    private void importBluetooth(File file) throws IOException {
+    public static List<EddystoneUidPacketEvent> getBluetoothEvents(File file) throws IOException {
         BufferedReader reader = getReader(file);
         String line;
+        List<EddystoneUidPacketEvent> events = new ArrayList<>();
+
         while ((line = reader.readLine()) != null) {
             if (line.startsWith("#")) {
                 continue;
@@ -146,17 +148,21 @@ public class ImportDataManager {
 
             EddystoneUidPacketEvent event = new EddystoneUidPacketEvent(deviceAddress, rssi, timestamp);
 
-            mData.add(event);
+            events.add(event);
         }
+
+        return events;
     }
 
-    private BufferedReader getReader(File file) throws FileNotFoundException {
+    private static BufferedReader getReader(File file) throws FileNotFoundException {
         return new BufferedReader(new FileReader(file));
     }
 
-    private void importWifi(File file) throws IOException {
+    public static List<SDKWifiScanResultEvent> getWifiEvents(File file) throws IOException {
         BufferedReader reader = getReader(file);
         String line;
+        List<SDKWifiScanResultEvent> events = new ArrayList<>();
+
         while ((line = reader.readLine()) != null) {
             if (line.startsWith("#")) {
                 continue;
@@ -188,8 +194,10 @@ public class ImportDataManager {
                     Integer.parseInt(wifiParts[2]),
                     macAddr, strMacAddr, rss, true, 0);
 
-            mData.add(event);
+            events.add(event);
         }
+
+        return events;
     }
 
     private void importSensors(File file) throws IOException {
