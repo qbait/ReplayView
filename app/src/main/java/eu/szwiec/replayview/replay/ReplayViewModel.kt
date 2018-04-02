@@ -14,10 +14,10 @@ class ReplayViewModel : ViewModel() {
     }
 
     private val speeds = listOf(1, 4, 16, 32)
-    val availableDataTypes = listOf(ImportDataManager.TYPE_WIFI, ImportDataManager.TYPE_GPS, ImportDataManager.TYPE_BLUETOOTH, ImportDataManager.TYPE_SENSOR)
+    val availableDataTypes = listOf(Type.WIFI, Type.GPS, Type.BLUETOOTH)
 
     private val playingThread: Thread
-    private var pickedDataTypes: Array<CharSequence> = emptyArray()
+    private var pickedDataTypes = emptyList<Type>()
 
     val stateLD = NonNullLiveData(State.NOT_READY)
     val progressLD = NonNullLiveData(0)
@@ -61,7 +61,7 @@ class ReplayViewModel : ViewModel() {
     }
 
     fun setPickedTypes(types: Array<CharSequence>) {
-        pickedDataTypes = types
+        pickedDataTypes = types.toTypeList()
     }
 
     fun onTypePicked() {
@@ -73,7 +73,7 @@ class ReplayViewModel : ViewModel() {
         importData(path, pickedDataTypes)
     }
 
-    private fun importData(path: String, pickedDataTypes: Array<CharSequence>) {
+    private fun importData(path: String, pickedDataTypes: List<Type>) {
         async(UI) {
             val replayEvents = bg { ImportDataManager.importData(path, pickedDataTypes) }
             onPostExecute(replayEvents.await())

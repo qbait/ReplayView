@@ -25,10 +25,6 @@ import static org.apache.commons.io.FilenameUtils.getExtension;
 
 public class EventsParser {
     File[] files;
-    private static final String WIFI_EXTENSION = "wifi";
-    private static final String BT_EXTENSION = "edyuid";
-    private static final String SENSOR_EXTENSION = "sensor";
-    private static final String GPS_EXTENSION = "gps";
 
     private EventsParser(File... files) {
         this.files = files;
@@ -49,13 +45,11 @@ public class EventsParser {
             String extension = getExtensionWithoutNumber(file);
 
             try {
-                if(extension.equals(WIFI_EXTENSION)) {
+                if(extension.equals(Type.WIFI.getFileExtension())) {
                     allEvents.addAll(getWifiEvents(file));
-                } else if(extension.equals(BT_EXTENSION)) {
+                } else if(extension.equals(Type.BLUETOOTH.getFileExtension())) {
                     allEvents.addAll(getBluetoothEvents(file));
-                } else if(extension.equals(SENSOR_EXTENSION)) {
-                    allEvents.addAll(getSensorEvents(file));
-                } else if(extension.equals(GPS_EXTENSION)) {
+                } else if(extension.equals(Type.GPS)) {
                     allEvents.addAll(getGpsEvents(file));
                 }
             } catch (IOException e) {
