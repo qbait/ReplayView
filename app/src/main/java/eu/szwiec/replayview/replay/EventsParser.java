@@ -14,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import eu.szwiec.replayview.otto.EddystoneUidPacketEvent;
@@ -24,16 +25,26 @@ import eu.szwiec.replayview.otto.SensorArrayValuesEvent;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 
 public class EventsParser {
-    File[] files;
+    List<File> files;
 
-    private EventsParser(File... files) {
+    private EventsParser(List<File> files) {
         this.files = files;
     }
 
-    public static List<ReplayEvent> getEvents(File... files) {
+    public static List<ReplayEvent> getEventsSortedByTimestamp(List<File> files) {
         EventsParser parser = new EventsParser(files);
 
         List<ReplayEvent> allEvents = parser.getAllEvents();
+
+        Collections.sort(allEvents, (o1, o2) -> {
+            if (o1.getNanoTimestamp() > o2.getNanoTimestamp()) {
+                return 1;
+            } else if (o1.getNanoTimestamp() < o2.getNanoTimestamp()) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
 
         return allEvents;
     }
@@ -41,15 +52,15 @@ public class EventsParser {
     private List<ReplayEvent> getAllEvents() {
         List<ReplayEvent> allEvents = new ArrayList<>();
 
-        for(File file : files) {
+        for (File file : files) {
             String extension = getExtensionWithoutNumber(file);
 
             try {
-                if(extension.equals(Type.WIFI.getFileExtension())) {
+                if (extension.equals(Type.WIFI.getFileExtension())) {
                     allEvents.addAll(getWifiEvents(file));
-                } else if(extension.equals(Type.BLUETOOTH.getFileExtension())) {
+                } else if (extension.equals(Type.BLUETOOTH.getFileExtension())) {
                     allEvents.addAll(getBluetoothEvents(file));
-                } else if(extension.equals(Type.GPS)) {
+                } else if (extension.equals(Type.GPS)) {
                     allEvents.addAll(getGpsEvents(file));
                 }
             } catch (IOException e) {
@@ -62,7 +73,7 @@ public class EventsParser {
 
     private String getExtensionWithoutNumber(File file) {
         String extenstion = getExtension(file.getName());
-        return extenstion.replaceAll("[0-9]","");
+        return extenstion.replaceAll("[0-9]", "");
     }
 
     private List<NvGeofenceEvent> getGpsEvents(File file) throws IOException {

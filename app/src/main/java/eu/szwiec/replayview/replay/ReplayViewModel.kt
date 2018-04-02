@@ -75,7 +75,11 @@ class ReplayViewModel : ViewModel() {
 
     private fun importData(path: String, pickedDataTypes: List<Type>) {
         async(UI) {
-            val replayEvents = bg { ImportDataManager.importData(path, pickedDataTypes) }
+            val replayEvents = bg {
+                val fileExtensions = pickedDataTypes.map { it.fileExtension }
+                val files = FilesProvider.getFiles(path, fileExtensions)
+                EventsParser.getEventsSortedByTimestamp(files)
+            }
             onPostExecute(replayEvents.await())
         }
     }
