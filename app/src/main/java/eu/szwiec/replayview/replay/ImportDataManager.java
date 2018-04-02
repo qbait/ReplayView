@@ -38,49 +38,74 @@ public class ImportDataManager {
     public static final String TYPE_BLUETOOTH = "bluetooth";
     public static final String TYPE_WIFI = "wifi";
 
-    private File mDir;
-    public static final List<ReplayEvent>  mData = new ArrayList<>();
+    private final File dir;
+    private final List<CharSequence> dataTypes;
 
-    public List<ReplayEvent> importData(String zipPath, CharSequence[] dataTypes) throws IOException {
+    public static List<ReplayEvent> importData(String zipPath, CharSequence[] dataTypes) {
+        ImportDataManager manager = new ImportDataManager(zipPath, dataTypes);
+        List<ReplayEvent> events = manager.getAllEvents();
+        List<ReplayEvent> sorted = manager.sortByTimestamp(events);
 
-        mData.clear();
+        return sorted;
+    }
 
+    private ImportDataManager(String zipPath, CharSequence[] types) {
+        dir = getExtractedDir(zipPath);
+        dataTypes = Arrays.asList(types);
+    }
+
+    private List<ReplayEvent> sortByTimestamp(List<ReplayEvent> events) {
+        if (dataTypes.size() > 1) {
+            Collections.sort(events, (o1, o2) -> Long.compare(o1.getNanoTimestamp(), o2.getNanoTimestamp()));
+        }
+
+        return events;
+    }
+
+    private List<ReplayEvent> getAllEvents() {
+
+        List<ReplayEvent> allEvents = new ArrayList<>();
+
+        try {
+
+            if (dataTypes.contains(TYPE_WIFI)) {
+                for (File file : getFiles("wifi", dir)) {
+                    allEvents.addAll(getWifiEvents(file));
+                }
+            }
+
+            if (dataTypes.contains(TYPE_BLUETOOTH)) {
+                for (File file : getFiles("edyuid", dir)) {
+                    allEvents.addAll(getBluetoothEvents(file));
+                }
+            }
+
+            if (dataTypes.contains(TYPE_SENSOR)) {
+                for (File file : getFiles("sensor", dir)) {
+                    getSensorEvents(file);
+                }
+            }
+
+            if (dataTypes.contains(TYPE_GPS)) {
+                for (File file : getFiles("gps", dir)) {
+                    getGpsEvents(file);
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return allEvents;
+    }
+
+    private File getExtractedDir(String zipPath) {
         String destinationPath = getDestinationPath(zipPath);
-        if (FileUtils.unzip(zipPath, destinationPath)) {
-            mDir = new File(destinationPath);
-        }
+        boolean isUnzipSuccessful = FileUtils.unzip(zipPath, destinationPath);
 
-        List<CharSequence> dataTypesList = Arrays.asList(dataTypes);
+        if(!isUnzipSuccessful) throw new RuntimeException("Problem with unzipping");
 
-        if (dataTypesList.contains(TYPE_WIFI)) {
-            for (File file : getFiles("wifi")) {
-                mData.addAll( getWifiEvents(file) );
-            }
-        }
-
-        if (dataTypesList.contains(TYPE_BLUETOOTH)) {
-            for (File file : getFiles("edyuid")) {
-                mData.addAll( getBluetoothEvents(file) );
-            }
-        }
-
-        if (dataTypesList.contains(TYPE_SENSOR)) {
-            for (File file : getFiles("sensor")) {
-                importSensors(file);
-            }
-        }
-
-        if (dataTypesList.contains(TYPE_GPS)) {
-            for (File file : getFiles("gps")) {
-                importGps(file);
-            }
-        }
-
-        if (dataTypesList.size() > 1) {
-            Collections.sort(mData, (o1, o2) -> Long.compare(o1.getNanoTimestamp(), o2.getNanoTimestamp()));
-        }
-
-        return mData;
+        return new File(destinationPath);
     }
 
     private String getDestinationPath(String zipPath) {
@@ -88,26 +113,28 @@ public class ImportDataManager {
         return SDKConstants.SDCARD_PATH + FilenameUtils.removeExtension(filenameWithExtension);
     }
 
-    private List<File> getFiles(String type) {
+    private List<File> getFiles(String type, File dir) {
         List<File> files = new ArrayList<>();
 
-        String[] names = mDir.list(
-                (dir, name) -> {
+        String[] names = dir.list(
+                (d, name) -> {
                     String regex = String.format(".*\\.%s\\d+", type);
                     return name.matches(regex);
                 });
 
         for (String name : names) {
-            File file = new File(mDir + "/" + name);
+            File file = new File(dir + "/" + name);
             files.add(file);
         }
 
         return files;
     }
 
-    private void importGps(File file) throws IOException {
+    private List<NvGeofenceEvent> getGpsEvents(File file) throws IOException {
         BufferedReader reader = getReader(file);
         String line;
+        List<NvGeofenceEvent> events = new ArrayList<>();
+
         while ((line = reader.readLine()) != null) {
             if (line.startsWith("#")) {
                 continue;
@@ -127,11 +154,13 @@ public class ImportDataManager {
 
             NvGeofenceEvent event = null;//= FenceUtils.getGeofenceEvent(PreferenceManager.getDefaultSharedPreferences(mContext), new Gson(), location);
 
-            mData.add(event);
+            events.add(event);
         }
+
+        return events;
     }
 
-    public static List<EddystoneUidPacketEvent> getBluetoothEvents(File file) throws IOException {
+    private List<EddystoneUidPacketEvent> getBluetoothEvents(File file) throws IOException {
         BufferedReader reader = getReader(file);
         String line;
         List<EddystoneUidPacketEvent> events = new ArrayList<>();
@@ -158,7 +187,7 @@ public class ImportDataManager {
         return new BufferedReader(new FileReader(file));
     }
 
-    public static List<SDKWifiScanResultEvent> getWifiEvents(File file) throws IOException {
+    private List<SDKWifiScanResultEvent> getWifiEvents(File file) throws IOException {
         BufferedReader reader = getReader(file);
         String line;
         List<SDKWifiScanResultEvent> events = new ArrayList<>();
@@ -200,7 +229,7 @@ public class ImportDataManager {
         return events;
     }
 
-    private void importSensors(File file) throws IOException {
+    private List<SensorArrayValuesEvent> getSensorEvents(File file) throws IOException {
 
         List<Long> time = new ArrayList<>();
         List<Integer> type = new ArrayList<>();
@@ -212,6 +241,8 @@ public class ImportDataManager {
 
         BufferedReader reader = getReader(file);
         String line;
+        List<SensorArrayValuesEvent> events = new ArrayList<>();
+
         while ((line = reader.readLine()) != null) {
             if (line.startsWith("#")) {
                 continue;
@@ -243,8 +274,10 @@ public class ImportDataManager {
 
             SensorArrayValuesEvent event = new SensorArrayValuesEvent(0, 0, timeArray, typeArray, xArray, yArray, zArray);
 
-            mData.add(event);
+            events.add(event);
         }
+
+        return events;
     }
 
 }
