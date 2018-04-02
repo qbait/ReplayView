@@ -1,4 +1,4 @@
-package eu.szwiec.replayview.replay
+package eu.szwiec.replayview.utils
 
 import android.arch.lifecycle.MutableLiveData
 

@@ -3,10 +3,13 @@ package eu.szwiec.replayview.replay
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
+import eu.szwiec.replayview.utils.NonNullLiveData
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import org.apache.commons.lang3.time.DurationFormatUtils
 import org.jetbrains.anko.coroutines.experimental.bg
+import java.util.ArrayList
+import java.util.concurrent.TimeUnit
 
 class ReplayViewModel : ViewModel() {
     enum class State {
@@ -73,6 +76,13 @@ class ReplayViewModel : ViewModel() {
         importData(path, pickedDataTypes)
     }
 
+    fun dialogDismissed() {
+        if (eventsLD.value.isNotEmpty())
+            stateLD.value = State.READY
+        else
+            stateLD.value = State.NOT_READY
+    }
+
     private fun importData(path: String, pickedDataTypes: List<Type>) {
         async(UI) {
             val replayEvents = bg {
@@ -110,13 +120,6 @@ class ReplayViewModel : ViewModel() {
     private fun stop() {
         isPlayingLD.postValue(false)
         progressLD.postValue(0)
-    }
-
-    fun dialogDismissed() {
-        if (eventsLD.value.isNotEmpty())
-            stateLD.value = State.READY
-        else
-            stateLD.value = State.NOT_READY
     }
 
     private fun initPlayingThread(): Thread {
@@ -161,5 +164,18 @@ class ReplayViewModel : ViewModel() {
 
     private fun format(timestampMs: Long): String {
         return DurationFormatUtils.formatDuration(timestampMs, "mm:ss")
+    }
+
+    private fun ReplayEvent.msTimestamp() : Long {
+        return TimeUnit.NANOSECONDS.toMillis(this.nanoTimestamp)
+    }
+
+    private fun Array<CharSequence>.toTypeList(): List<Type> {
+        val typeList = ArrayList<Type>()
+        for (text in this) {
+            val type = Type.getType(text.toString())
+            typeList.add(type)
+        }
+        return typeList
     }
 }
