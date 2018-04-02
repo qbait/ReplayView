@@ -24,18 +24,8 @@ import eu.szwiec.replayview.otto.SensorArrayValuesEvent;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 
 public class EventsParser {
-    List<File> files;
-
-    private EventsParser(List<File> files) {
-        this.files = files;
-    }
 
     public static List<ReplayEvent> getEvents(List<File> files) {
-        EventsParser parser = new EventsParser(files);
-        return parser.getAllEvents();
-    }
-
-    private List<ReplayEvent> getAllEvents() {
         List<ReplayEvent> allEvents = new ArrayList<>();
 
         for (File file : files) {
@@ -57,12 +47,12 @@ public class EventsParser {
         return allEvents;
     }
 
-    private String getExtensionWithoutNumber(File file) {
+    private static String getExtensionWithoutNumber(File file) {
         String extenstion = getExtension(file.getName());
         return extenstion.replaceAll("[0-9]", "");
     }
 
-    private List<NvGeofenceEvent> getGpsEvents(File file) throws IOException {
+    private static List<NvGeofenceEvent> getGpsEvents(File file) throws IOException {
         BufferedReader reader = getReader(file);
         String line;
         List<NvGeofenceEvent> events = new ArrayList<>();
@@ -92,7 +82,7 @@ public class EventsParser {
         return events;
     }
 
-    private List<EddystoneUidPacketEvent> getBluetoothEvents(File file) throws IOException {
+    private static List<EddystoneUidPacketEvent> getBluetoothEvents(File file) throws IOException {
         BufferedReader reader = getReader(file);
         String line;
         List<EddystoneUidPacketEvent> events = new ArrayList<>();
@@ -119,7 +109,7 @@ public class EventsParser {
         return new BufferedReader(new FileReader(file));
     }
 
-    private List<SDKWifiScanResultEvent> getWifiEvents(File file) throws IOException {
+    private static List<SDKWifiScanResultEvent> getWifiEvents(File file) throws IOException {
         BufferedReader reader = getReader(file);
         String line;
         List<SDKWifiScanResultEvent> events = new ArrayList<>();
