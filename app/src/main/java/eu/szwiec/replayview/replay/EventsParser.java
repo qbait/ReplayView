@@ -151,7 +151,7 @@ public class EventsParser {
         return events;
     }
 
-    private List<SensorArrayValuesEvent> getSensorEvents(File file) throws IOException {
+    private static List<SensorArrayValuesEvent> getSensorEvents(File file) throws IOException {
 
         List<Long> time = new ArrayList<>();
         List<Integer> type = new ArrayList<>();
