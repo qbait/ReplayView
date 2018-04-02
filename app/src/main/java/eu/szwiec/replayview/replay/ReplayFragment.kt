@@ -73,7 +73,7 @@ class ReplayFragment : Fragment(), AnkoLogger {
         properties.extensions = arrayOf("zip")
 
         val filePickerDialog = FilePickerDialog(context, properties)
-        filePickerDialog.setTitle("Select a File")
+        filePickerDialog.setTitle(getString(R.string.file_picker_title))
 
         filePickerDialog.setDialogSelectionListener { files -> viewModel.onFilePicked(files[0]) }
         filePickerDialog.setOnDismissListener({ viewModel.dialogDismissed() })
@@ -83,7 +83,7 @@ class ReplayFragment : Fragment(), AnkoLogger {
 
     private fun buildTypePickerDialog(): MaterialDialog {
         return MaterialDialog.Builder(context!!)
-                .title("Choose data type")
+                .title(getString(R.string.type_picker_title))
                 .items(viewModel.availableDataTypes)
                 .itemsCallbackMultiChoice(null) { dialog, which, types ->
                     viewModel.setPickedTypes(types)

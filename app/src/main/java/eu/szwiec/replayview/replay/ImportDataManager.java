@@ -33,10 +33,10 @@ import eu.szwiec.replayview.otto.SensorArrayValuesEvent;
 
 public class ImportDataManager {
 
-    static final String TYPE_GPS = "gps";
-    static final String TYPE_SENSOR = "sensor";
-    static final String TYPE_BLUETOOTH = "bluetooth";
-    static final String TYPE_WIFI = "wifi";
+    public static final String TYPE_GPS = "gps";
+    public static final String TYPE_SENSOR = "sensor";
+    public static final String TYPE_BLUETOOTH = "bluetooth";
+    public static final String TYPE_WIFI = "wifi";
 
     private File mDir;
     private final List<ReplayEvent> mData = new ArrayList<>();
