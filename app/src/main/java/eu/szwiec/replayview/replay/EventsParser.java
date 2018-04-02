@@ -14,7 +14,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import eu.szwiec.replayview.otto.EddystoneUidPacketEvent;
@@ -33,20 +32,7 @@ public class EventsParser {
 
     public static List<ReplayEvent> getEvents(List<File> files) {
         EventsParser parser = new EventsParser(files);
-
-        List<ReplayEvent> allEvents = parser.getAllEvents();
-
-        Collections.sort(allEvents, (o1, o2) -> {
-            if (o1.getNanoTimestamp() > o2.getNanoTimestamp()) {
-                return 1;
-            } else if (o1.getNanoTimestamp() < o2.getNanoTimestamp()) {
-                return -1;
-            } else {
-                return 0;
-            }
-        });
-
-        return allEvents;
+        return parser.getAllEvents();
     }
 
     private List<ReplayEvent> getAllEvents() {
