@@ -36,7 +36,7 @@ public class EventsParser {
                     allEvents.addAll(getWifiEvents(file));
                 } else if (extension.equals(Type.BLUETOOTH.getFileExtension())) {
                     allEvents.addAll(getBluetoothEvents(file));
-                } else if (extension.equals(Type.GPS)) {
+                } else if (extension.equals(Type.GPS.getFileExtension())) {
                     allEvents.addAll(getGpsEvents(file));
                 }
             } catch (IOException e) {
@@ -54,10 +54,9 @@ public class EventsParser {
 
     private static List<NvGeofenceEvent> getGpsEvents(File file) throws IOException {
         BufferedReader reader = getReader(file);
-        String line;
         List<NvGeofenceEvent> events = new ArrayList<>();
 
-        while ((line = reader.readLine()) != null) {
+        for (String line = reader.readLine(); line != null; line = reader.readLine()) {
             if (line.startsWith("#")) {
                 continue;
             }
@@ -84,10 +83,9 @@ public class EventsParser {
 
     private static List<EddystoneUidPacketEvent> getBluetoothEvents(File file) throws IOException {
         BufferedReader reader = getReader(file);
-        String line;
         List<EddystoneUidPacketEvent> events = new ArrayList<>();
 
-        while ((line = reader.readLine()) != null) {
+        for (String line = reader.readLine(); line != null; line = reader.readLine()) {
             if (line.startsWith("#")) {
                 continue;
             }
@@ -111,10 +109,9 @@ public class EventsParser {
 
     private static List<SDKWifiScanResultEvent> getWifiEvents(File file) throws IOException {
         BufferedReader reader = getReader(file);
-        String line;
         List<SDKWifiScanResultEvent> events = new ArrayList<>();
 
-        while ((line = reader.readLine()) != null) {
+        for (String line = reader.readLine(); line != null; line = reader.readLine()) {
             if (line.startsWith("#")) {
                 continue;
             }
@@ -162,10 +159,9 @@ public class EventsParser {
         List<Integer> newArrayIndexes = new ArrayList<>();
 
         BufferedReader reader = getReader(file);
-        String line;
         List<SensorArrayValuesEvent> events = new ArrayList<>();
 
-        while ((line = reader.readLine()) != null) {
+        for (String line = reader.readLine(); line != null; line = reader.readLine()) {
             if (line.startsWith("#")) {
                 continue;
             }
