@@ -174,7 +174,7 @@ class ReplayViewModel : ViewModel() {
         val typeList = ArrayList<Type>()
         for (text in this) {
             val type = Type.getType(text.toString())
-            typeList.add(type)
+            type?.let { typeList.add(it) }
         }
         return typeList
     }
