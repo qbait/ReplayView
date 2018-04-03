@@ -8,7 +8,6 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import org.apache.commons.lang3.time.DurationFormatUtils
 import org.jetbrains.anko.coroutines.experimental.bg
-import java.util.ArrayList
 import java.util.concurrent.TimeUnit
 
 class ReplayViewModel : ViewModel() {
@@ -64,7 +63,7 @@ class ReplayViewModel : ViewModel() {
     }
 
     fun setPickedTypes(types: Array<CharSequence>) {
-        pickedDataTypes = types.toTypeList()
+        pickedDataTypes = Type.getTypes(types)
     }
 
     fun onTypePicked() {
@@ -166,16 +165,7 @@ class ReplayViewModel : ViewModel() {
         return DurationFormatUtils.formatDuration(timestampMs, "mm:ss")
     }
 
-    private fun ReplayEvent.msTimestamp() : Long {
+    private fun ReplayEvent.msTimestamp(): Long {
         return TimeUnit.NANOSECONDS.toMillis(this.nanoTimestamp)
-    }
-
-    private fun Array<CharSequence>.toTypeList(): List<Type> {
-        val typeList = ArrayList<Type>()
-        for (text in this) {
-            val type = Type.getType(text.toString())
-            type?.let { typeList.add(it) }
-        }
-        return typeList
     }
 }

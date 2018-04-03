@@ -1,6 +1,7 @@
 package eu.szwiec.replayview.replay
 
 import android.hardware.Sensor
+import java.util.*
 
 enum class Type constructor(val id: Int, val label: String, val fileExtension: String) {
 
@@ -27,7 +28,7 @@ enum class Type constructor(val id: Int, val label: String, val fileExtension: S
 
         fun getType(label: String): Type? {
 
-            return when(label) {
+            return when (label) {
                 GPS.label -> GPS
                 BLUETOOTH.label -> BLUETOOTH
                 WIFI.label -> WIFI
@@ -43,6 +44,17 @@ enum class Type constructor(val id: Int, val label: String, val fileExtension: S
                 PROXIMITY.label -> PROXIMITY
                 else -> null
             }
+        }
+
+        fun getTypes(texts: Array<CharSequence>): List<Type> {
+
+            val types = ArrayList<Type>()
+            for (text in texts) {
+                val type = Type.getType(text.toString())
+                type?.let { types.add(it) }
+            }
+
+            return types
         }
     }
 }
