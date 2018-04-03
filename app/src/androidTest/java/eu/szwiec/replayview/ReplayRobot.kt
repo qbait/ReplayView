@@ -1,26 +1,27 @@
 package eu.szwiec.replayview
 
+import android.content.Context
 import eu.szwiec.replayview.replay.Type
 
-class ReplayRobot : ScreenRobot<ReplayRobot>() {
+class ReplayRobot(private val context: Context) : BaseTestRobot() {
 
-    fun clickPickFileButton(): ReplayRobot {
-        return clickView(R.id.pick_file_button)
+    fun clickPickFileButton() = apply {
+        clickView(R.id.pick_file_button)
     }
 
-    fun chooseWifi(): ReplayRobot {
-        return clickView(Type.WIFI.toString())
+    fun chooseWifi() = apply {
+        clickView(Type.WIFI.toString())
     }
 
-    fun chooseBt(): ReplayRobot {
-        return clickView(Type.BLUETOOTH.toString())
+    fun chooseBt() = apply {
+        clickView(Type.BLUETOOTH.toString())
     }
 
-    fun confirmDataType(): ReplayRobot {
-        return clickView(R.id.md_buttonDefaultPositive)
+    fun confirmDataType() = apply {
+        clickView(R.id.md_buttonDefaultPositive)
     }
 
-    fun hasFilePickerCorrectTitle(): ReplayRobot {
-        return checkViewHasText(R.id.title, R.string.file_picker_title)
+    fun hasFilePickerCorrectTitle() = apply {
+        checkViewHasText(R.id.title, R.string.file_picker_title)
     }
 }

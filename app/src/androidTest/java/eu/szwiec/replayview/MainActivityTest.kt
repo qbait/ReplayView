@@ -1,17 +1,24 @@
 package eu.szwiec.replayview
 
 import android.support.test.rule.ActivityTestRule
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 class MainActivityTest {
-    @Rule
-    @JvmField
+
+    @get:Rule
     var activityRule = ActivityTestRule(MainActivity::class.java)
+    private lateinit var robot: ReplayRobot
+
+    @Before
+    fun setup() {
+        robot = ReplayRobot(activityRule.activity)
+    }
 
     @Test
     fun dialogsShowCorrectly() {
-        ReplayRobot()
+        robot
                 .clickPickFileButton()
                 .chooseBt()
                 .chooseWifi()
