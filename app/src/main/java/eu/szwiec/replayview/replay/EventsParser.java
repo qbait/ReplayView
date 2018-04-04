@@ -9,10 +9,10 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,23 +21,27 @@ import eu.szwiec.replayview.otto.NvGeofenceEvent;
 import eu.szwiec.replayview.otto.SDKWifiScanResultEvent;
 import eu.szwiec.replayview.otto.SensorArrayValuesEvent;
 
-import static org.apache.commons.io.FilenameUtils.getExtension;
-
 public class EventsParser {
 
-    public static List<ReplayEvent> getEvents(List<File> files) {
+    public static List<ReplayEvent> getEvents(List<ReplayFile> files) {
         List<ReplayEvent> allEvents = new ArrayList<>();
 
-        for (File file : files) {
-            String extension = getExtensionWithoutNumber(file);
-
+        for (ReplayFile file : files) {
             try {
-                if (extension.equals(Type.WIFI.getFileExtension())) {
-                    allEvents.addAll(getWifiEvents(file));
-                } else if (extension.equals(Type.BLUETOOTH.getFileExtension())) {
-                    allEvents.addAll(getBluetoothEvents(file));
-                } else if (extension.equals(Type.GPS.getFileExtension())) {
-                    allEvents.addAll(getGpsEvents(file));
+                InputStream stream = file.getStream();
+
+                switch (file.getType()) {
+                    case WIFI:
+                        allEvents.addAll(getWifiEvents(stream));
+                        break;
+                    case BLUETOOTH:
+                        allEvents.addAll(getBluetoothEvents(stream));
+                        break;
+                    case GPS:
+                        allEvents.addAll(getGpsEvents(stream));
+                        break;
+                    default:
+                        allEvents.addAll(getSensorEvents(stream));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -47,13 +51,8 @@ public class EventsParser {
         return allEvents;
     }
 
-    private static String getExtensionWithoutNumber(File file) {
-        String extenstion = getExtension(file.getName());
-        return extenstion.replaceAll("[0-9]", "");
-    }
-
-    private static List<NvGeofenceEvent> getGpsEvents(File file) throws IOException {
-        BufferedReader reader = getReader(file);
+    private static List<NvGeofenceEvent> getGpsEvents(InputStream stream) throws IOException {
+        BufferedReader reader = getReader(stream);
         List<NvGeofenceEvent> events = new ArrayList<>();
 
         for (String line = reader.readLine(); line != null; line = reader.readLine()) {
@@ -81,8 +80,8 @@ public class EventsParser {
         return events;
     }
 
-    private static List<EddystoneUidPacketEvent> getBluetoothEvents(File file) throws IOException {
-        BufferedReader reader = getReader(file);
+    private static List<EddystoneUidPacketEvent> getBluetoothEvents(InputStream stream) throws IOException {
+        BufferedReader reader = getReader(stream);
         List<EddystoneUidPacketEvent> events = new ArrayList<>();
 
         for (String line = reader.readLine(); line != null; line = reader.readLine()) {
@@ -103,12 +102,12 @@ public class EventsParser {
         return events;
     }
 
-    private static BufferedReader getReader(File file) throws FileNotFoundException {
-        return new BufferedReader(new FileReader(file));
+    private static BufferedReader getReader(InputStream stream) throws UnsupportedEncodingException {
+        return new BufferedReader(new InputStreamReader(stream, "UTF-8"));
     }
 
-    private static List<SDKWifiScanResultEvent> getWifiEvents(File file) throws IOException {
-        BufferedReader reader = getReader(file);
+    private static List<SDKWifiScanResultEvent> getWifiEvents(InputStream stream) throws IOException {
+        BufferedReader reader = getReader(stream);
         List<SDKWifiScanResultEvent> events = new ArrayList<>();
 
         for (String line = reader.readLine(); line != null; line = reader.readLine()) {
@@ -148,7 +147,7 @@ public class EventsParser {
         return events;
     }
 
-    private static List<SensorArrayValuesEvent> getSensorEvents(File file) throws IOException {
+    private static List<SensorArrayValuesEvent> getSensorEvents(InputStream stream) throws IOException {
 
         List<Long> time = new ArrayList<>();
         List<Integer> type = new ArrayList<>();
@@ -158,7 +157,7 @@ public class EventsParser {
 
         List<Integer> newArrayIndexes = new ArrayList<>();
 
-        BufferedReader reader = getReader(file);
+        BufferedReader reader = getReader(stream);
         List<SensorArrayValuesEvent> events = new ArrayList<>();
 
         for (String line = reader.readLine(); line != null; line = reader.readLine()) {

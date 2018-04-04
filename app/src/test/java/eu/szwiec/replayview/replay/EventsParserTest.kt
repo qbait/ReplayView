@@ -11,10 +11,14 @@ class EventsParserTest {
 
     @Test
     fun getEvents() {
-        val files = listOf(getFile("/replay/sample.edyuid0"), getFile("/replay/sample.wifi0"))
+        val btStream = EventsParserTest::class.java.getResourceAsStream("/replay/sample.edyuid0")
+        val wifiStream = EventsParserTest::class.java.getResourceAsStream("/replay/sample.wifi0")
+        val btFile = ReplayFile(btStream, Type.BLUETOOTH)
+        val wifiFile = ReplayFile(wifiStream, Type.WIFI)
+
         val expectedSize = 368
 
-        val events = EventsParser.getEvents(files)
+        val events = EventsParser.getEvents(listOf(btFile, wifiFile))
 
         assertEquals(expectedSize, events.size)
         assertTrue(events.stream().allMatch { e -> e is ReplayEvent })

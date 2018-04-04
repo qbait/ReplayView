@@ -4,14 +4,15 @@ import eu.szwiec.replayview.FileUtils
 import eu.szwiec.replayview.SDKConstants
 import org.apache.commons.io.FilenameUtils
 import java.io.File
+import java.io.FileInputStream
 import java.util.*
 
 object FilesProvider {
 
-    fun getFiles(zipPath: String, extensions: List<String>): List<File> {
+    fun getFiles(zipPath: String, types: List<Type>): List<ReplayFile> {
         val extractedDir = extractDir(zipPath)
 
-        return getMatchingFiles(extensions, extractedDir)
+        return getFilesForAllTypes(types, extractedDir)
     }
 
     private fun extractDir(zipPath: String): File {
@@ -28,26 +29,26 @@ object FilesProvider {
         return SDKConstants.SDCARD_PATH + FilenameUtils.removeExtension(filenameWithExtension)
     }
 
-    private fun getMatchingFiles(types: List<String>, dir: File): List<File> {
-        val files = ArrayList<File>()
+    private fun getFilesForAllTypes(types: List<Type>, dir: File): List<ReplayFile> {
+        val files = ArrayList<ReplayFile>()
 
         for (type in types) {
-            files.addAll(getMatchingFiles(type, dir))
+            files.addAll(getFilesForType(type, dir))
         }
         return files
     }
 
-    private fun getMatchingFiles(type: String, dir: File): List<File> {
-        val files = ArrayList<File>()
+    private fun getFilesForType(type: Type, dir: File): List<ReplayFile> {
+        val files = ArrayList<ReplayFile>()
 
         val names = dir.list { d, name ->
-            val regex = String.format(".*\\.%s\\d+", type)
+            val regex = String.format(".*\\.%s\\d+", type.fileExtension)
             name.matches(regex.toRegex())
         }
 
         for (name in names) {
-            val file = File(dir.toString() + "/" + name)
-            files.add(file)
+            val stream = FileInputStream(dir.toString() + "/" + name)
+            files.add(ReplayFile(stream, type))
         }
 
         return files
