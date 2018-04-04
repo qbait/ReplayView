@@ -4,15 +4,14 @@ import eu.szwiec.replayview.replay.ReplayFile
 import eu.szwiec.replayview.replay.Type
 
 class TestApp : App() {
+    private lateinit var files: List<ReplayFile>
 
-    override fun getFiles(zipPath: String, types: List<Type>): List<ReplayFile> {
+    fun setFiles(files: List<ReplayFile>) {
+        this.files = files
+    }
 
-        val btStream = assets.open("sample.edyuid0")
-        val wifiStream = assets.open("sample.wifi0")
-        val btFile = ReplayFile(btStream, Type.BLUETOOTH)
-        val wifiFile = ReplayFile(wifiStream, Type.WIFI)
-
-        return listOf(btFile, wifiFile)
+    override fun provideFiles(zipPath: String, types: List<Type>): List<ReplayFile> {
+        return files
     }
 
 }

@@ -89,7 +89,9 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application),
     private fun importData(path: String, pickedDataTypes: List<Type>) {
         async(UI) {
             val replayEvents = bg {
-                val files = getApplication<App>().getFiles(path, pickedDataTypes)
+                val files = getApplication<App>().provideFiles(path, pickedDataTypes)
+                info("DUPA files = $files")
+
                 val events = EventsParser.getEvents(files)
                 events.sortBy { it.nanoTimestamp }
                 info("events = $events")
