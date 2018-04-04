@@ -4,7 +4,7 @@ import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Transformations
-import eu.szwiec.replayview.App
+import eu.szwiec.replayview.Injection
 import eu.szwiec.replayview.utils.NonNullLiveData
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
@@ -89,7 +89,7 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application),
     private fun importData(path: String?, pickedDataTypes: List<Type>) {
         async(UI) {
             val replayEvents = bg {
-                val files = getApplication<App>().provideFiles(path, pickedDataTypes)
+                val files = Injection.provideFiles(getApplication(), path, pickedDataTypes)
                 info("DUPA files = $files")
 
                 val events = EventsParser.getEvents(files)
