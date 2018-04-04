@@ -17,11 +17,23 @@ class ReplayRobot(private val context: Context) : BaseTestRobot() {
         clickView(Type.BLUETOOTH.toString())
     }
 
-    fun confirmDataType() = apply {
+    fun confirmType() = apply {
         clickView(R.id.md_buttonDefaultPositive)
+    }
+
+    fun confirmFile() = apply {
+        clickView(R.id.select)
     }
 
     fun hasFilePickerCorrectTitle() = apply {
         checkViewHasText(R.id.title, R.string.file_picker_title)
+    }
+
+    fun isTotalTimeCorrect() = apply {
+        checkViewHasText(R.id.total_time, R.string.test_total_time)
+    }
+
+    fun chooseZip() = apply {
+        clickListItem(17)
     }
 }

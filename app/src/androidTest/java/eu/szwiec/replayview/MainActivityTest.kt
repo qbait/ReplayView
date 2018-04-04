@@ -1,5 +1,6 @@
 package eu.szwiec.replayview
 
+import android.support.test.espresso.IdlingRegistry
 import android.support.test.rule.ActivityTestRule
 import org.junit.Before
 import org.junit.Rule
@@ -18,11 +19,21 @@ class MainActivityTest {
 
     @Test
     fun dialogsShowCorrectly() {
+
+        val idlingResource = ProgressIdlingResource(activityRule)
+        IdlingRegistry.getInstance().register(idlingResource)
+
         robot
                 .clickPickFileButton()
                 .chooseBt()
                 .chooseWifi()
-                .confirmDataType()
+                .confirmType()
                 .hasFilePickerCorrectTitle()
+                .chooseZip()
+                .confirmFile()
+                .isTotalTimeCorrect()
+
+        IdlingRegistry.getInstance().unregister(idlingResource)
+
     }
 }

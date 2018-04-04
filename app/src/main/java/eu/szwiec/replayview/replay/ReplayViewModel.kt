@@ -1,16 +1,20 @@
 package eu.szwiec.replayview.replay
 
+import android.app.Application
+import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Transformations
-import android.arch.lifecycle.ViewModel
+import eu.szwiec.replayview.App
 import eu.szwiec.replayview.utils.NonNullLiveData
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import org.apache.commons.lang3.time.DurationFormatUtils
+import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.coroutines.experimental.bg
+import org.jetbrains.anko.info
 import java.util.concurrent.TimeUnit
 
-class ReplayViewModel : ViewModel() {
+class ReplayViewModel(application: Application) : AndroidViewModel(application), AnkoLogger {
     enum class State {
         NOT_READY, PICKING_TYPE, PICKING_FILE, PROCESSING, READY, ERROR
     }
@@ -85,9 +89,10 @@ class ReplayViewModel : ViewModel() {
     private fun importData(path: String, pickedDataTypes: List<Type>) {
         async(UI) {
             val replayEvents = bg {
-                val files = FilesProvider.getFiles(path, pickedDataTypes)
+                val files = getApplication<App>().getFiles(path, pickedDataTypes)
                 val events = EventsParser.getEvents(files)
                 events.sortBy { it.nanoTimestamp }
+                info("events = $events")
                 events
             }
             onPostExecute(replayEvents.await())
