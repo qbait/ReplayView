@@ -28,26 +28,22 @@ class EventsParserTest {
         assertTrue(events[2] is EddystoneUidPacketEvent)
         val randomBtEvent = events[2] as EddystoneUidPacketEvent
         assertTrue(randomBtEvent is EddystoneUidPacketEvent)
-        assertEquals(randomBtEvent.deviceAddress, "CB:3B:9B:41:B0:C3")
-        assertEquals(randomBtEvent.rssi, -92)
-        assertEquals(randomBtEvent.timestamp, 24439885559346)
+        assertEquals("CB:3B:9B:41:B0:C3", randomBtEvent.deviceAddress)
+        assertEquals(-92, randomBtEvent.rssi)
+        assertEquals(24439885559346, randomBtEvent.timestamp)
 
         assertTrue(events[7] is SDKWifiScanResultEvent)
         val randomWifiEvent = events[7] as SDKWifiScanResultEvent
-        assertEquals(randomWifiEvent.macAddr.size, 193)
-        assertEquals(randomWifiEvent.macAddr[1], 10133350838403861)
-        assertEquals(randomWifiEvent.millitime, 1509029544451)
-        assertEquals(randomWifiEvent.nanotime, 24445396708856)
-        assertEquals(randomWifiEvent.rss.size, 193)
-        assertEquals(randomWifiEvent.rss[1], -55)
-        assertEquals(randomWifiEvent.scanSize, 193)
-        assertEquals(randomWifiEvent.scanStartTime, 1509029540451)
-        assertEquals(randomWifiEvent.strMacAddr.size, 193)
-        assertEquals(randomWifiEvent.strMacAddr[1], "24:00:3a:99:1b:83:15")
+        assertEquals(193, randomWifiEvent.macAddr.size)
+        assertEquals(10133350838403861, randomWifiEvent.macAddr[1])
+        assertEquals(1509029544451, randomWifiEvent.millitime)
+        assertEquals(24445396708856, randomWifiEvent.nanotime)
+        assertEquals(193, randomWifiEvent.rss.size)
+        assertEquals(-55, randomWifiEvent.rss[1])
+        assertEquals(193, randomWifiEvent.scanSize)
+        assertEquals(1509029540451, randomWifiEvent.scanStartTime)
+        assertEquals(193, randomWifiEvent.strMacAddr.size)
+        assertEquals("24:00:3a:99:1b:83:15", randomWifiEvent.strMacAddr[1])
     }
 
-    private fun getFile(path: String): File? {
-        val url = EventsParserTest::class.java.getResource(path)
-        return File(url.toURI())
-    }
 }
