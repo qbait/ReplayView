@@ -9,7 +9,9 @@ import java.util.*
 
 object FilesProvider {
 
-    fun getFiles(zipPath: String, types: List<Type>): List<ReplayFile> {
+    fun getFiles(zipPath: String?, types: List<Type>): List<ReplayFile> {
+        if(zipPath == null) return emptyList()
+
         val extractedDir = extractDir(zipPath)
 
         return getFilesForAllTypes(types, extractedDir)

@@ -10,7 +10,7 @@ class TestApp : App() {
         this.files = files
     }
 
-    override fun provideFiles(zipPath: String, types: List<Type>): List<ReplayFile> {
+    override fun provideFiles(zipPath: String?, types: List<Type>): List<ReplayFile> {
         return files
     }
 

@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProviders
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.os.Environment
-import android.support.test.espresso.idling.CountingIdlingResource
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -42,7 +41,10 @@ class ReplayFragment : Fragment(), AnkoLogger {
         viewModel.stateLD.observe(this, Observer { state ->
             when (state) {
                 ReplayViewModel.State.PICKING_TYPE -> typePickerDialog.show()
-                ReplayViewModel.State.PICKING_FILE -> filePickerDialog.show()
+                ReplayViewModel.State.PICKING_FILE -> {
+                    filePickerDialog.show()
+                    filePickerDialog.findViewById<View>(R.id.select).isEnabled = true //for testing, but in the perfect world, I should get rid of it
+                }
                 ReplayViewModel.State.PROCESSING -> progressDialog.show()
                 ReplayViewModel.State.READY -> progressDialog.dismiss()
                 ReplayViewModel.State.ERROR -> {
@@ -76,7 +78,7 @@ class ReplayFragment : Fragment(), AnkoLogger {
         val filePickerDialog = FilePickerDialog(context, properties)
         filePickerDialog.setTitle(getString(R.string.file_picker_title))
 
-        filePickerDialog.setDialogSelectionListener { files -> viewModel.onFilePicked(files[0]) }
+        filePickerDialog.setDialogSelectionListener { files -> viewModel.onFilePicked(files.firstOrNull()) }
         filePickerDialog.setOnDismissListener({ viewModel.dialogDismissed() })
 
         return filePickerDialog

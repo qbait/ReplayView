@@ -35,7 +35,6 @@ class MainActivityTest {
                 .chooseWifi()
                 .confirmType()
                 .hasFilePickerCorrectTitle()
-                .chooseZip()
                 .confirmFile()
                 .isTotalTimeCorrect()
 

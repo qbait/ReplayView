@@ -32,8 +32,4 @@ class ReplayRobot(private val context: Context) : BaseTestRobot() {
     fun isTotalTimeCorrect() = apply {
         checkViewHasText(R.id.total_time, R.string.test_total_time)
     }
-
-    fun chooseZip() = apply {
-        clickListItem(17)
-    }
 }

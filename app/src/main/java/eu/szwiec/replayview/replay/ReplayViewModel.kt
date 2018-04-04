@@ -74,7 +74,7 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application),
         stateLD.value = State.PICKING_FILE
     }
 
-    fun onFilePicked(path: String) {
+    fun onFilePicked(path: String?) {
         stateLD.value = State.PROCESSING
         importData(path, pickedDataTypes)
     }
@@ -86,7 +86,7 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application),
             stateLD.value = State.NOT_READY
     }
 
-    private fun importData(path: String, pickedDataTypes: List<Type>) {
+    private fun importData(path: String?, pickedDataTypes: List<Type>) {
         async(UI) {
             val replayEvents = bg {
                 val files = getApplication<App>().provideFiles(path, pickedDataTypes)
