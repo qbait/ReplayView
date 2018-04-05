@@ -13,7 +13,7 @@ class ProgressIdlingResource(private val activityRule: ActivityTestRule<MainActi
 
         val progress = activityRule.activity.findViewById<View>(android.R.id.progress)
         val idle = progress == null
-        if (idle == null) {
+        if (idle) {
             callback?.onTransitionToIdle()
         }
         return idle
