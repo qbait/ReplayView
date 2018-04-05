@@ -1,12 +1,9 @@
 package eu.szwiec.replayview.replay
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Transformations
-import eu.szwiec.replayview.App
+import android.arch.lifecycle.ViewModel
 import eu.szwiec.replayview.FilesProvider
-import eu.szwiec.replayview.R
 import eu.szwiec.replayview.utils.NonNullLiveData
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
@@ -15,14 +12,13 @@ import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.coroutines.experimental.bg
 import org.jetbrains.anko.info
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
-class ReplayViewModel(application: Application) : AndroidViewModel(application), AnkoLogger {
+class ReplayViewModel(filesProvider: FilesProvider) : ViewModel(), AnkoLogger {
     enum class State {
         NOT_READY, PICKING_TYPE, PICKING_FILE, PROCESSING, READY, ERROR
     }
 
-    private val speeds = application.resources.getIntArray(R.array.replaySpeeds)
+    val speeds = listOf(1, 4, 16, 32)
     val availableDataTypes = listOf(Type.WIFI, Type.GPS, Type.BLUETOOTH)
 
     private val playingThread: Thread
@@ -39,11 +35,11 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application),
     val maxProgressLD: LiveData<Int> = Transformations.map(eventsLD, { events -> events.size - 1 })
     val isPlayingEnabledLD: LiveData<Boolean> = Transformations.map(stateLD, { state -> state == State.READY })
 
-    @Inject lateinit var filesProvider: FilesProvider
+    val filesProvider: FilesProvider
 
     init {
         playingThread = initPlayingThread()
-        getApplication<App>().component.inject(this)
+        this.filesProvider = filesProvider
     }
 
     fun togglePlayPause() {

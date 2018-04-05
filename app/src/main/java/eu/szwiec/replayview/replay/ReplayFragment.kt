@@ -14,12 +14,17 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.github.angads25.filepicker.model.DialogConfigs
 import com.github.angads25.filepicker.model.DialogProperties
 import com.github.angads25.filepicker.view.FilePickerDialog
+import eu.szwiec.replayview.App
 import eu.szwiec.replayview.R
 import eu.szwiec.replayview.databinding.FragmentReplayBinding
 import org.jetbrains.anko.AnkoLogger
 import java.io.File
+import javax.inject.Inject
 
 class ReplayFragment : Fragment(), AnkoLogger {
+
+    @Inject
+    lateinit var viewModelFactory: ReplayViewModelFactory
 
     private lateinit var viewModel: ReplayViewModel
     private lateinit var binding: FragmentReplayBinding
@@ -29,8 +34,10 @@ class ReplayFragment : Fragment(), AnkoLogger {
     private val filePickerDialog: FilePickerDialog by lazy { buildFilePickerDialog() }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        (context?.applicationContext as App).component.inject(this)
+
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_replay, container, false)
-        viewModel = ViewModelProviders.of(this).get(ReplayViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(ReplayViewModel::class.java)
         binding.let {
             it.viewModel = viewModel
             it.setLifecycleOwner(this)

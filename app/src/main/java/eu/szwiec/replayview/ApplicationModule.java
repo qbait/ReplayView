@@ -8,6 +8,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import eu.szwiec.replayview.replay.FilesProviderImpl;
+import eu.szwiec.replayview.replay.ReplayViewModelFactory;
 
 @Module
 public class ApplicationModule {
@@ -28,6 +29,13 @@ public class ApplicationModule {
     @Singleton
     public FilesProvider provideFilesProvider(Context context) {
         return new FilesProviderImpl(context);
+    }
+
+    @Provides
+    @Singleton
+    public ReplayViewModelFactory provideReplayViewModelFactory(Context context) {
+        FilesProvider filesProvider = new FilesProviderImpl(context);
+        return new ReplayViewModelFactory(filesProvider);
     }
 
 }
