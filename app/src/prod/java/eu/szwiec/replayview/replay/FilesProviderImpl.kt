@@ -1,15 +1,17 @@
 package eu.szwiec.replayview.replay
 
+import android.content.Context
 import eu.szwiec.replayview.FileUtils
+import eu.szwiec.replayview.FilesProvider
 import eu.szwiec.replayview.SDKConstants
 import org.apache.commons.io.FilenameUtils
 import java.io.File
 import java.io.FileInputStream
 import java.util.*
 
-object FilesProvider {
+class FilesProviderImpl(context: Context) : FilesProvider {
 
-    fun getFiles(zipPath: String?, types: List<Type>): List<ReplayFile> {
+    override fun provide(zipPath: String?, types: List<Type>): List<ReplayFile> {
         if(zipPath == null) return emptyList()
 
         val extractedDir = extractDir(zipPath)

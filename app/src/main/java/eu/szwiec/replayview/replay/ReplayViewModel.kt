@@ -4,7 +4,8 @@ import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Transformations
-import eu.szwiec.replayview.Injection
+import eu.szwiec.replayview.App
+import eu.szwiec.replayview.FilesProvider
 import eu.szwiec.replayview.R
 import eu.szwiec.replayview.utils.NonNullLiveData
 import kotlinx.coroutines.experimental.android.UI
@@ -14,6 +15,7 @@ import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.coroutines.experimental.bg
 import org.jetbrains.anko.info
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 class ReplayViewModel(application: Application) : AndroidViewModel(application), AnkoLogger {
     enum class State {
@@ -37,8 +39,11 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application),
     val maxProgressLD: LiveData<Int> = Transformations.map(eventsLD, { events -> events.size - 1 })
     val isPlayingEnabledLD: LiveData<Boolean> = Transformations.map(stateLD, { state -> state == State.READY })
 
+    @Inject lateinit var filesProvider: FilesProvider
+
     init {
         playingThread = initPlayingThread()
+        getApplication<App>().component.inject(this)
     }
 
     fun togglePlayPause() {
@@ -90,7 +95,7 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application),
     private fun importData(path: String?, pickedDataTypes: List<Type>) {
         async(UI) {
             val replayEvents = bg {
-                val files = Injection.provideFiles(getApplication(), path, pickedDataTypes)
+                val files = filesProvider.provide(path, pickedDataTypes)
                 info("DUPA files = $files")
 
                 val events = EventsParser.getEvents(files)
