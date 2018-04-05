@@ -11,10 +11,8 @@ class EventsParserTest {
 
     @Test
     fun getEvents() {
-        val btStream = EventsParserTest::class.java.getResourceAsStream("/replay/sample.edyuid0")
-        val wifiStream = EventsParserTest::class.java.getResourceAsStream("/replay/sample.wifi0")
-        val btFile = ReplayFile(btStream, Type.BLUETOOTH)
-        val wifiFile = ReplayFile(wifiStream, Type.WIFI)
+        val btFile = ReplayFile(openAsset("sample.edyuid0"), Type.BLUETOOTH)
+        val wifiFile = ReplayFile(openAsset("sample.wifi0"), Type.WIFI)
 
         val expectedSize = 368
 

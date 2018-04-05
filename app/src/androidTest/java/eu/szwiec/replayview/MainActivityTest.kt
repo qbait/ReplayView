@@ -20,6 +20,7 @@ class MainActivityTest {
 
     @Test
     fun replayWorksCorrectly() {
+
         val speeds = activityRule.activity.resources.getIntArray(R.array.replaySpeeds)
         val idlingResource = ProgressIdlingResource(activityRule)
 
