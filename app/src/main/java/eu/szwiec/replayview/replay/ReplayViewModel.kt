@@ -5,6 +5,7 @@ import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Transformations
 import eu.szwiec.replayview.Injection
+import eu.szwiec.replayview.R
 import eu.szwiec.replayview.utils.NonNullLiveData
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
@@ -19,7 +20,7 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application),
         NOT_READY, PICKING_TYPE, PICKING_FILE, PROCESSING, READY, ERROR
     }
 
-    private val speeds = listOf(1, 4, 16, 32)
+    private val speeds = getApplication<Application>().resources.getIntArray(R.array.replaySpeeds)
     val availableDataTypes = listOf(Type.WIFI, Type.GPS, Type.BLUETOOTH)
 
     private val playingThread: Thread

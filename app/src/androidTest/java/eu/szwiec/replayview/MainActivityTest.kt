@@ -15,12 +15,14 @@ class MainActivityTest {
     @Before
     fun setup() {
         robot = ReplayRobot(activityRule.activity)
+
     }
 
     @Test
     fun replayWorksCorrectly() {
-
+        val speeds = activityRule.activity.resources.getIntArray(R.array.replaySpeeds)
         val idlingResource = ProgressIdlingResource(activityRule)
+
         IdlingRegistry.getInstance().register(idlingResource)
 
         robot
@@ -37,17 +39,16 @@ class MainActivityTest {
                 .isPlayIconShown()
                 .play()
                 .isPauseIconShown()
-                .isSpeedCorrect(1)
+                .isSpeedCorrect(speeds[0])
                 .clickSpeedButton()
-                .isSpeedCorrect(4)
+                .isSpeedCorrect(speeds[1])
                 .clickSpeedButton()
-                .isSpeedCorrect(16)
+                .isSpeedCorrect(speeds[2])
                 .clickSpeedButton()
-                .isSpeedCorrect(32)
+                .isSpeedCorrect(speeds[3])
                 .clickSpeedButton()
-                .isSpeedCorrect(1)
+                .isSpeedCorrect(speeds[0])
 
         IdlingRegistry.getInstance().unregister(idlingResource)
-
     }
 }
