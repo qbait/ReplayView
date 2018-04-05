@@ -29,8 +29,7 @@ class ApplicationModule(private val application: Application) {
     @Singleton
     fun provideReplayViewModelFactory(context: Context): ReplayViewModelFactory {
         val filesProvider = FilesProviderImpl(context)
-        val speeds = context.resources.getIntArray(R.array.replaySpeeds)
-        return ReplayViewModelFactory(filesProvider, speeds)
+        return ReplayViewModelFactory(filesProvider)
     }
 
 }

@@ -5,9 +5,9 @@ import android.arch.lifecycle.ViewModelProvider
 
 import eu.szwiec.replayview.FilesProvider
 
-class ReplayViewModelFactory(private val filesProvider: FilesProvider, private val speeds: IntArray) : ViewModelProvider.NewInstanceFactory() {
+class ReplayViewModelFactory(private val filesProvider: FilesProvider) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return ReplayViewModel(filesProvider, speeds) as T
+        return ReplayViewModel(filesProvider) as T
     }
 }
