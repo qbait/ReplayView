@@ -13,12 +13,11 @@ import org.jetbrains.anko.coroutines.experimental.bg
 import org.jetbrains.anko.info
 import java.util.concurrent.TimeUnit
 
-class ReplayViewModel(filesProvider: FilesProvider) : ViewModel(), AnkoLogger {
+class ReplayViewModel(filesProvider: FilesProvider, speeds: IntArray) : ViewModel(), AnkoLogger {
     enum class State {
         NOT_READY, PICKING_TYPE, PICKING_FILE, PROCESSING, READY, ERROR
     }
 
-    val speeds = listOf(1, 4, 16, 32)
     val availableDataTypes = listOf(Type.WIFI, Type.GPS, Type.BLUETOOTH)
 
     private val playingThread: Thread
@@ -36,10 +35,12 @@ class ReplayViewModel(filesProvider: FilesProvider) : ViewModel(), AnkoLogger {
     val isPlayingEnabledLD: LiveData<Boolean> = Transformations.map(stateLD, { state -> state == State.READY })
 
     val filesProvider: FilesProvider
+    val speeds: IntArray
 
     init {
         playingThread = initPlayingThread()
         this.filesProvider = filesProvider
+        this.speeds = speeds
     }
 
     fun togglePlayPause() {

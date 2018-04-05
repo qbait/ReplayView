@@ -5,7 +5,6 @@ import eu.szwiec.replayview.utils.NonNullLiveData
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 
 
@@ -18,7 +17,7 @@ class ReplayViewModelTest {
     @Before
     fun init() {
         MockitoAnnotations.initMocks(this)
-        viewModel = ReplayViewModel(filesProviderMock)
+        //viewModel = ReplayViewModel(filesProviderMock, speeds)
     }
 
     @Test
