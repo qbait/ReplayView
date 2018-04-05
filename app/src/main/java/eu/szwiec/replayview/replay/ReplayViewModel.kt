@@ -22,7 +22,7 @@ class ReplayViewModel(application: Application) : AndroidViewModel(application),
         NOT_READY, PICKING_TYPE, PICKING_FILE, PROCESSING, READY, ERROR
     }
 
-    private val speeds = getApplication<Application>().resources.getIntArray(R.array.replaySpeeds)
+    private val speeds = application.resources.getIntArray(R.array.replaySpeeds)
     val availableDataTypes = listOf(Type.WIFI, Type.GPS, Type.BLUETOOTH)
 
     private val playingThread: Thread
