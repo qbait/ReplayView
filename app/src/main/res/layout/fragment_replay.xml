@@ -33,7 +33,7 @@
             android:layout_width="52dp"
             android:layout_height="48dp"
             android:layout_weight="0"
-            android:text="@{String.valueOf(viewModel.speedLD)+`x`}"
+            android:text="@{String.format(@string/replay_speed_mask, viewModel.speedLD)}"
             android:onClick="@{() -> viewModel.changeSpeed()}"
             style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:enabled="@{viewModel.isPlayingEnabledLD}"
