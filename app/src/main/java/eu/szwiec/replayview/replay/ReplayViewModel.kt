@@ -3,6 +3,7 @@ package eu.szwiec.replayview.replay
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
+import android.support.annotation.VisibleForTesting
 import eu.szwiec.replayview.utils.NonNullLiveData
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
@@ -144,7 +145,8 @@ class ReplayViewModel(filesProvider: ReplayFilesProvider) : ViewModel(), AnkoLog
         }
     }
 
-    private fun formatPlayingTime(progress: Int, events: List<ReplayEvent>): String {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun formatPlayingTime(progress: Int, events: List<ReplayEvent>): String {
         if (events.isEmpty()) return ""
 
         val firstTimestamp = events[0].msTimestamp()
@@ -153,7 +155,8 @@ class ReplayViewModel(filesProvider: ReplayFilesProvider) : ViewModel(), AnkoLog
         return format(currentTimestamp - firstTimestamp)
     }
 
-    private fun formatTotalTime(events: List<ReplayEvent>): String {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun formatTotalTime(events: List<ReplayEvent>): String {
         if (events.isEmpty()) return ""
 
         val firstTimestamp = events[0].msTimestamp()
