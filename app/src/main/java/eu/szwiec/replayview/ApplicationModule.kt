@@ -7,7 +7,8 @@ import javax.inject.Singleton
 
 import dagger.Module
 import dagger.Provides
-import eu.szwiec.replayview.replay.FilesProviderImpl
+import eu.szwiec.replayview.replay.ReplayFilesProvider
+import eu.szwiec.replayview.replay.ReplayFilesProviderImpl
 import eu.szwiec.replayview.replay.ReplayViewModelFactory
 
 @Module
@@ -21,14 +22,14 @@ class ApplicationModule(private val application: Application) {
 
     @Provides
     @Singleton
-    fun provideFilesProvider(context: Context): FilesProvider {
-        return FilesProviderImpl(context)
+    fun provideFilesProvider(context: Context): ReplayFilesProvider {
+        return ReplayFilesProviderImpl(context)
     }
 
     @Provides
     @Singleton
     fun provideReplayViewModelFactory(context: Context): ReplayViewModelFactory {
-        val filesProvider = FilesProviderImpl(context)
+        val filesProvider = ReplayFilesProviderImpl(context)
         return ReplayViewModelFactory(filesProvider)
     }
 

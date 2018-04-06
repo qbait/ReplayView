@@ -1,14 +1,13 @@
 package eu.szwiec.replayview.replay
 
 import android.content.Context
-import eu.szwiec.replayview.FilesProvider
 
-class FilesProviderImpl: FilesProvider {
-    override fun provide(zipPath: String?, types: List<Type>): List<ReplayFile> {
+class ReplayFilesProviderImpl: ReplayFilesProvider {
+    override fun provide(zipPath: String?, types: List<ReplayType>): List<ReplayFile> {
         val btStream = context.assets.open("sample.edyuid0")
         val wifiStream = context.assets.open("sample.wifi0")
-        val btFile = ReplayFile(btStream, Type.BLUETOOTH)
-        val wifiFile = ReplayFile(wifiStream, Type.WIFI)
+        val btFile = ReplayFile(btStream, ReplayType.BLUETOOTH)
+        val wifiFile = ReplayFile(wifiStream, ReplayType.WIFI)
 
         return listOf(btFile, wifiFile)
     }

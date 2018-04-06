@@ -1,7 +1,7 @@
 package eu.szwiec.replayview
 
 import android.content.Context
-import eu.szwiec.replayview.replay.Type
+import eu.szwiec.replayview.replay.ReplayType
 
 class ReplayRobot(private val context: Context) : BaseTestRobot() {
 
@@ -18,11 +18,11 @@ class ReplayRobot(private val context: Context) : BaseTestRobot() {
     }
 
     fun chooseWifi() = apply {
-        clickView(Type.WIFI.toString())
+        clickView(ReplayType.WIFI.toString())
     }
 
     fun chooseBt() = apply {
-        clickView(Type.BLUETOOTH.toString())
+        clickView(ReplayType.BLUETOOTH.toString())
     }
 
     fun confirmType() = apply {

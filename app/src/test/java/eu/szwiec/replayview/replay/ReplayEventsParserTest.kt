@@ -5,18 +5,17 @@ import eu.szwiec.replayview.otto.SDKWifiScanResultEvent
 import junit.framework.Assert.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.Test
-import java.io.File
 
-class EventsParserTest {
+class ReplayEventsParserTest {
 
     @Test
     fun getEvents() {
-        val btFile = ReplayFile(openAsset("sample.edyuid0"), Type.BLUETOOTH)
-        val wifiFile = ReplayFile(openAsset("sample.wifi0"), Type.WIFI)
+        val btFile = ReplayFile(openAsset("sample.edyuid0"), ReplayType.BLUETOOTH)
+        val wifiFile = ReplayFile(openAsset("sample.wifi0"), ReplayType.WIFI)
 
         val expectedSize = 368
 
-        val events = EventsParser.getEvents(listOf(btFile, wifiFile))
+        val events = ReplayEventsParser.getEvents(listOf(btFile, wifiFile))
 
         assertEquals(expectedSize, events.size)
         assertTrue(events.stream().allMatch { e -> e is ReplayEvent })

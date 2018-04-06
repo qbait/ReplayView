@@ -3,7 +3,6 @@ package eu.szwiec.replayview.replay
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
-import eu.szwiec.replayview.FilesProvider
 import eu.szwiec.replayview.utils.NonNullLiveData
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
@@ -13,10 +12,10 @@ import org.jetbrains.anko.coroutines.experimental.bg
 import org.jetbrains.anko.info
 import java.util.concurrent.TimeUnit
 
-class ReplayViewModel(filesProvider: FilesProvider) : ViewModel(), AnkoLogger {
+class ReplayViewModel(filesProvider: ReplayFilesProvider) : ViewModel(), AnkoLogger {
 
     private val playingThread: Thread
-    private var pickedDataTypes = emptyList<Type>()
+    private var pickedDataTypes = emptyList<ReplayType>()
 
     val stateLD = NonNullLiveData(State.NOT_READY)
     val progressLD = NonNullLiveData(0)
@@ -29,7 +28,7 @@ class ReplayViewModel(filesProvider: FilesProvider) : ViewModel(), AnkoLogger {
     val maxProgressLD: LiveData<Int> = Transformations.map(eventsLD, { events -> events.size - 1 })
     val isPlayingEnabledLD: LiveData<Boolean> = Transformations.map(stateLD, { state -> state == State.READY })
 
-    val filesProvider: FilesProvider
+    val filesProvider: ReplayFilesProvider
 
     init {
         playingThread = initPlayingThread()
@@ -63,7 +62,7 @@ class ReplayViewModel(filesProvider: FilesProvider) : ViewModel(), AnkoLogger {
     }
 
     fun setPickedTypes(types: Array<CharSequence>) {
-        pickedDataTypes = Type.getTypes(types)
+        pickedDataTypes = ReplayType.getTypes(types)
     }
 
     fun onTypePicked() {
@@ -82,13 +81,13 @@ class ReplayViewModel(filesProvider: FilesProvider) : ViewModel(), AnkoLogger {
             stateLD.value = State.NOT_READY
     }
 
-    private fun importData(path: String?, pickedDataTypes: List<Type>) {
+    private fun importData(path: String?, pickedDataTypes: List<ReplayType>) {
         async(UI) {
             val replayEvents = bg {
                 val files = filesProvider.provide(path, pickedDataTypes)
                 info("DUPA files = $files")
 
-                val events = EventsParser.getEvents(files)
+                val events = ReplayEventsParser.getEvents(files)
                 events.sortBy { it.nanoTimestamp }
                 info("events = $events")
                 events

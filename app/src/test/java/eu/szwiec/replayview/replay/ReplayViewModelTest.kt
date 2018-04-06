@@ -2,7 +2,6 @@ package eu.szwiec.replayview.replay
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
-import eu.szwiec.replayview.FilesProvider
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -13,7 +12,7 @@ import org.mockito.MockitoAnnotations
 
 class ReplayViewModelTest {
     @Mock
-    private lateinit var filesProviderMock: FilesProvider
+    private lateinit var filesProviderMock: ReplayFilesProvider
     @Mock
     private lateinit var observer: Observer<Boolean>
 

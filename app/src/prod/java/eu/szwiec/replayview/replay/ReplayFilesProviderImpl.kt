@@ -9,7 +9,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.util.*
 
-class FilesProviderImpl(context: Context) : FilesProvider {
+class ReplayFilesProviderImpl(context: Context) : FilesProvider {
 
     override fun provide(zipPath: String?, types: List<Type>): List<ReplayFile> {
         if(zipPath == null) return emptyList()

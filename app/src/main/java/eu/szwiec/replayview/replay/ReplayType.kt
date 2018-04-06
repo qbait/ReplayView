@@ -3,7 +3,7 @@ package eu.szwiec.replayview.replay
 import android.hardware.Sensor
 import java.util.*
 
-enum class Type constructor(val id: Int, val label: String, val fileExtension: String) {
+enum class ReplayType constructor(val id: Int, val label: String, val fileExtension: String) {
 
     GPS(100, "GPS", "gps"),
     BLUETOOTH(101, "Bluetooth", "edyuid"),
@@ -26,7 +26,7 @@ enum class Type constructor(val id: Int, val label: String, val fileExtension: S
 
     companion object {
 
-        fun getType(label: String): Type? {
+        fun getType(label: String): ReplayType? {
 
             return when (label) {
                 GPS.label -> GPS
@@ -46,11 +46,11 @@ enum class Type constructor(val id: Int, val label: String, val fileExtension: S
             }
         }
 
-        fun getTypes(texts: Array<CharSequence>): List<Type> {
+        fun getTypes(texts: Array<CharSequence>): List<ReplayType> {
 
-            val types = ArrayList<Type>()
+            val types = ArrayList<ReplayType>()
             for (text in texts) {
-                val type = Type.getType(text.toString())
+                val type = ReplayType.getType(text.toString())
                 type?.let { types.add(it) }
             }
 

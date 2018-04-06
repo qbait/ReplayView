@@ -21,7 +21,7 @@ import eu.szwiec.replayview.otto.NvGeofenceEvent;
 import eu.szwiec.replayview.otto.SDKWifiScanResultEvent;
 import eu.szwiec.replayview.otto.SensorArrayValuesEvent;
 
-public class EventsParser {
+public class ReplayEventsParser {
 
     public static List<ReplayEvent> getEvents(List<ReplayFile> files) {
         List<ReplayEvent> allEvents = new ArrayList<>();
