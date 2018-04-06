@@ -47,14 +47,14 @@ class ReplayFragment : Fragment(), AnkoLogger {
 
         viewModel.stateLD.observe(this, Observer { state ->
             when (state) {
-                ReplayViewModel.State.PICKING_TYPE -> typePickerDialog.show()
-                ReplayViewModel.State.PICKING_FILE -> {
+                State.PICKING_TYPE -> typePickerDialog.show()
+                State.PICKING_FILE -> {
                     filePickerDialog.show()
                     filePickerDialog.findViewById<View>(R.id.select).isEnabled = true //for testing, but in the perfect world, I should get rid of it
                 }
-                ReplayViewModel.State.PROCESSING -> progressDialog.show()
-                ReplayViewModel.State.READY -> progressDialog.dismiss()
-                ReplayViewModel.State.ERROR -> {
+                State.PROCESSING -> progressDialog.show()
+                State.READY -> progressDialog.dismiss()
+                State.ERROR -> {
                     progressDialog.dismiss()
                     Toast.makeText(activity, "Something went wrong", Toast.LENGTH_SHORT).show()
                 }
@@ -94,7 +94,7 @@ class ReplayFragment : Fragment(), AnkoLogger {
     private fun buildTypePickerDialog(): MaterialDialog {
         return MaterialDialog.Builder(context!!)
                 .title(getString(R.string.type_picker_title))
-                .items(viewModel.availableDataTypes)
+                .items(AVAILABLE_TYPES)
                 .itemsCallbackMultiChoice(null) { dialog, which, types ->
                     viewModel.setPickedTypes(types)
                     true

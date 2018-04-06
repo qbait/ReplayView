@@ -2,6 +2,7 @@ package eu.szwiec.replayview
 
 import android.support.test.espresso.IdlingRegistry
 import android.support.test.rule.ActivityTestRule
+import eu.szwiec.replayview.replay.SPEEDS
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -39,15 +40,15 @@ class MainActivityTest {
                 .isPlayIconShown()
                 .play()
                 .isPauseIconShown()
-                .isSpeedCorrect(REPLAY_SPEEDS[0])
+                .isSpeedCorrect(SPEEDS[0])
                 .clickSpeedButton()
-                .isSpeedCorrect(REPLAY_SPEEDS[1])
+                .isSpeedCorrect(SPEEDS[1])
                 .clickSpeedButton()
-                .isSpeedCorrect(REPLAY_SPEEDS[2])
+                .isSpeedCorrect(SPEEDS[2])
                 .clickSpeedButton()
-                .isSpeedCorrect(REPLAY_SPEEDS[3])
+                .isSpeedCorrect(SPEEDS[3])
                 .clickSpeedButton()
-                .isSpeedCorrect(REPLAY_SPEEDS[0])
+                .isSpeedCorrect(SPEEDS[0])
 
         IdlingRegistry.getInstance().unregister(idlingResource)
     }

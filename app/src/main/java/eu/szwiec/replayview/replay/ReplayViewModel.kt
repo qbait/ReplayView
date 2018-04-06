@@ -4,7 +4,6 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import eu.szwiec.replayview.FilesProvider
-import eu.szwiec.replayview.REPLAY_SPEEDS
 import eu.szwiec.replayview.utils.NonNullLiveData
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
@@ -15,18 +14,13 @@ import org.jetbrains.anko.info
 import java.util.concurrent.TimeUnit
 
 class ReplayViewModel(filesProvider: FilesProvider) : ViewModel(), AnkoLogger {
-    enum class State {
-        NOT_READY, PICKING_TYPE, PICKING_FILE, PROCESSING, READY, ERROR
-    }
-
-    val availableDataTypes = listOf(Type.WIFI, Type.GPS, Type.BLUETOOTH)
 
     private val playingThread: Thread
     private var pickedDataTypes = emptyList<Type>()
 
     val stateLD = NonNullLiveData(State.NOT_READY)
     val progressLD = NonNullLiveData(0)
-    val speedLD = NonNullLiveData(REPLAY_SPEEDS[0])
+    val speedLD = NonNullLiveData(SPEEDS[0])
     private val eventsLD = NonNullLiveData(emptyList<ReplayEvent>())
     val isPlayingLD = NonNullLiveData(false)
 
@@ -54,13 +48,13 @@ class ReplayViewModel(filesProvider: FilesProvider) : ViewModel(), AnkoLogger {
         val nextSpeedId: Int
 
         val currentSpeed = speedLD.value
-        val currentSpeedId = REPLAY_SPEEDS.indexOf(currentSpeed)
-        nextSpeedId = if (currentSpeedId == REPLAY_SPEEDS.size - 1) {
+        val currentSpeedId = SPEEDS.indexOf(currentSpeed)
+        nextSpeedId = if (currentSpeedId == SPEEDS.size - 1) {
             0
         } else {
             currentSpeedId + 1
         }
-        speedLD.value = REPLAY_SPEEDS[nextSpeedId]
+        speedLD.value = SPEEDS[nextSpeedId]
     }
 
 
