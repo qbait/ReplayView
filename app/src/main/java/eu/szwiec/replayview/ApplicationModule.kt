@@ -28,8 +28,7 @@ class ApplicationModule(private val application: Application) {
 
     @Provides
     @Singleton
-    fun provideReplayViewModelFactory(context: Context): ReplayViewModelFactory {
-        val filesProvider = ReplayFilesProviderImpl(context)
+    fun provideReplayViewModelFactory(filesProvider: ReplayFilesProvider): ReplayViewModelFactory {
         return ReplayViewModelFactory(filesProvider)
     }
 

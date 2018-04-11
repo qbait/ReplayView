@@ -2,16 +2,15 @@ package eu.szwiec.replayview.replay
 
 import android.content.Context
 import eu.szwiec.replayview.FileUtils
-import eu.szwiec.replayview.FilesProvider
 import eu.szwiec.replayview.SDKConstants
 import org.apache.commons.io.FilenameUtils
 import java.io.File
 import java.io.FileInputStream
 import java.util.*
 
-class ReplayFilesProviderImpl(context: Context) : FilesProvider {
+class ReplayFilesProviderImpl(context: Context) : ReplayFilesProvider {
 
-    override fun provide(zipPath: String?, types: List<Type>): List<ReplayFile> {
+    override fun provide(zipPath: String?, types: List<ReplayType>): List<ReplayFile> {
         if(zipPath == null) return emptyList()
 
         val extractedDir = extractDir(zipPath)
@@ -33,7 +32,7 @@ class ReplayFilesProviderImpl(context: Context) : FilesProvider {
         return SDKConstants.SDCARD_PATH + FilenameUtils.removeExtension(filenameWithExtension)
     }
 
-    private fun getFilesForAllTypes(types: List<Type>, dir: File): List<ReplayFile> {
+    private fun getFilesForAllTypes(types: List<ReplayType>, dir: File): List<ReplayFile> {
         val files = ArrayList<ReplayFile>()
 
         for (type in types) {
@@ -42,7 +41,7 @@ class ReplayFilesProviderImpl(context: Context) : FilesProvider {
         return files
     }
 
-    private fun getFilesForType(type: Type, dir: File): List<ReplayFile> {
+    private fun getFilesForType(type: ReplayType, dir: File): List<ReplayFile> {
         val files = ArrayList<ReplayFile>()
 
         val names = dir.list { d, name ->
